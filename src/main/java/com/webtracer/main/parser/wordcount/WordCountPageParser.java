@@ -11,6 +11,6 @@ import com.webtracer.main.parser.GenericPageParser;
  * interface will provide the logic for parsing web pages and returning the results
  * as a {@link WordCountParseResult}.
  */
-public interface WordCountPageParser extends GenericPageParser<WordCountParseResult> {
+interface WordCountPageParser extends GenericPageParser<WordCountParseResult> {
 
 }

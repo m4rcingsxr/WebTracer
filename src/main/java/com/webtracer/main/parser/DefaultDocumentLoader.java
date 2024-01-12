@@ -19,7 +19,7 @@ import java.util.Optional;
  * Default implementation of {@link DocumentLoader} that handles both local and remote URIs.
  * It applies a timeout for remote documents.
  */
-public class DefaultDocumentLoader implements DocumentLoader {
+public final class DefaultDocumentLoader implements DocumentLoader {
 
     private final Duration parseTimeout;
 

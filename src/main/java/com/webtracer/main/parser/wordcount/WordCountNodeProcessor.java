@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
  * <p> The class is not designed to be used independently; rather, it is a utility component
  * within a broader HTML parsing framework.</p>
  */
-class WordCountNodeProcessor {
+final class WordCountNodeProcessor {
 
     /**
      * Pattern to match whitespace characters. This pattern is used to split text into words.

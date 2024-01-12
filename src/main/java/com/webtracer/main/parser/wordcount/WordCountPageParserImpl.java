@@ -59,16 +59,12 @@ final class WordCountPageParserImpl implements WordCountPageParser {
 
         Document document = documentOpt.get();
 
-        // Create an instance of WordCountParseResult.Builder
         WordCountParseResult.Builder resultBuilder = new WordCountParseResult.Builder();
-
-        // Create an instance of WordCountNodeProcessor and pass the resultBuilder
         WordCountNodeProcessor nodeProcessor = new WordCountNodeProcessor(excludeWordPatterns, resultBuilder, uri);
 
-        // Traverse the document and process each node
+        // Traverse the document and process each node, builder accessed by single thread
         document.traverse(nodeProcessor::processNode);
 
-        // Return the result from the node processor
         return nodeProcessor.getResult();
     }
 
