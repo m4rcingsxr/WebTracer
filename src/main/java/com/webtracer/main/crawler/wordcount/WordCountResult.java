@@ -1,4 +1,6 @@
-package com.webtracer.main.crawler;
+package com.webtracer.main.crawler.wordcount;
+
+import com.webtracer.main.crawler.CrawlResult;
 
 /**
  * This final class represents the result of a web crawling operation that is specifically
@@ -11,8 +13,11 @@ package com.webtracer.main.crawler;
  * relevant data extracted during the crawl.
  *
  * As it implements the {@link CrawlResult} interface, instances of this class can be returned
- * by the `crawl` method in the {@link WordCountWebCrawler} interface, providing a structured
+ * by the `crawl` method in the {@link com.webtracer.main.crawler.wordcount.WordCountWebCrawler} interface, providing a structured
  * way to access the results of a word count-focused web crawl.
  */
-final class WordCountResult implements CrawlResult {
+public final class WordCountResult implements CrawlResult {
+
+
+
 }

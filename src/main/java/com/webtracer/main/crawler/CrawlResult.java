@@ -11,5 +11,5 @@ package com.webtracer.main.crawler;
  * The {@link GenericWebCrawler} interface's `crawl` method returns an instance of this interface,
  * encapsulating the final outcome of the crawling process.
  */
-interface CrawlResult {
+public interface CrawlResult {
 }

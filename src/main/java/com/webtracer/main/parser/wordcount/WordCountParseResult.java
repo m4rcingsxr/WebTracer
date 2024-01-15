@@ -1,26 +1,39 @@
 package com.webtracer.main.parser.wordcount;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import com.webtracer.main.parser.ParseResult;
+import lombok.*;
 
 import java.util.*;
 
 /**
- * Represents the result of a web crawler parsing operation. This class stores the most
- * frequently occurring words and the list of hyperlinks found on the parsed HTML page.
+ * The WordCountParseResult class represents the result of a web page parsing operation focused on word counts.
+ * This class stores the most frequently occurring words and the list of hyperlinks found on the parsed HTML page.
+ * It is an immutable class and is intended to be built using its nested {@link Builder} class.
  */
 @Getter
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-final class WordCountParseResult {
-
-    private final Map<String, Integer> wordFrequencyMap;
-    private final List<String> hyperLinkList;
+final class WordCountParseResult extends ParseResult {
 
     /**
-     * Builder class for constructing {@link WordCountParseResult} instances. This builder
-     * tracks word counts and hyperlinks found during the parsing of an HTML page.
+     * A map that holds the frequency of words found on the parsed web page.
+     * The keys are the words, and the values are their respective counts.
+     */
+    @NonNull
+    private final Map<String, Integer> wordFrequencyMap;
+
+    /**
+     * Private constructor to enforce the use of the {@link Builder} class for creating instances.
+     *
+     * @param wordFrequencyMap a map of word frequencies extracted from the web page
+     * @param hyperlinkList    a list of hyperlinks extracted from the web page
+     */
+    private WordCountParseResult(Map<String, Integer> wordFrequencyMap, List<String> hyperlinkList) {
+        super(hyperlinkList);
+        this.wordFrequencyMap = wordFrequencyMap;
+    }
+
+    /**
+     * The Builder class for constructing {@link WordCountParseResult} instances.
+     * This builder tracks word counts and hyperlinks found during the parsing of an HTML page.
      */
     static final class Builder {
         private final Map<String, Integer> wordFrequencyMap = new HashMap<>();

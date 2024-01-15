@@ -1,4 +1,6 @@
-package com.webtracer.main.crawler;
+package com.webtracer.main.crawler.wordcount;
+
+import com.webtracer.main.crawler.GenericWebCrawler;
 
 import java.util.List;
 

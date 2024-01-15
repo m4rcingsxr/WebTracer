@@ -8,7 +8,7 @@ import java.util.List;
  * The crawler is initialized with a list of starting URLs and processes the web pages to extract the
  * desired information. The result of the crawl is encapsulated in a {@link CrawlResult} object.
  */
-interface GenericWebCrawler {
+public interface GenericWebCrawler {
 
     /**
      * Starts the web crawling process using the provided list of initial URLs. The implementation
