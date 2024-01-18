@@ -2,6 +2,7 @@ package com.webtracer.main.parser.wordcount;
 
 import com.webtracer.main.parser.DocumentLoader;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Document;
@@ -20,8 +21,9 @@ import java.util.regex.Pattern;
  * <p> Utilizes the JSoup library for HTML parsing. This class acts as an adapter around JSoup's
  * API, as JSoup does not resolve relative hyperlinks correctly when parsing local HTML files.</p>
  */
+@Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-final class WordCountPageParserImpl implements WordCountPageParser {
+public final class WordCountPageParserImpl implements WordCountPageParser {
 
     @NonNull
     private final String pageUri;

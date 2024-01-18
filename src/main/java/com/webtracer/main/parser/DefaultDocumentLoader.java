@@ -1,6 +1,7 @@
 package com.webtracer.main.parser;
 
 import com.webtracer.main.parser.DocumentLoader;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
@@ -19,6 +20,7 @@ import java.util.Optional;
  * Default implementation of {@link DocumentLoader} that handles both local and remote URIs.
  * It applies a timeout for remote documents.
  */
+@Getter
 public final class DefaultDocumentLoader implements DocumentLoader {
 
     private final Duration parseTimeout;

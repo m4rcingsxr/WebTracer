@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
  * <p>This implementation leverages the Abstract Factory pattern, allowing the creation of specialized parser instances
  * without tying the client code to the specifics of the parser's construction.
  */
-final class WordCountPageParserFactoryImpl implements AbstractPageParserFactory {
+public final class WordCountPageParserFactoryImpl implements AbstractPageParserFactory {
 
     private final List<Pattern> excludedPatterns;
     private final DocumentLoader documentLoader;
@@ -35,7 +35,7 @@ final class WordCountPageParserFactoryImpl implements AbstractPageParserFactory 
      *                         that should be excluded from parsing.
      * @param crawlTimeout     the duration to be used as a timeout for the document loading process.
      */
-    WordCountPageParserFactoryImpl(
+    public WordCountPageParserFactoryImpl(
             List<Pattern> excludedPatterns,
             Duration crawlTimeout) {
         this.excludedPatterns = excludedPatterns;
