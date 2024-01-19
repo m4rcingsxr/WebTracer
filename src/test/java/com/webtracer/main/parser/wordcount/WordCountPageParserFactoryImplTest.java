@@ -2,8 +2,6 @@ package com.webtracer.main.parser.wordcount;
 
 import com.webtracer.main.parser.DefaultDocumentLoader;
 import com.webtracer.main.parser.PageParser;
-import com.webtracer.main.parser.wordcount.WordCountPageParserFactoryImpl;
-import com.webtracer.main.parser.wordcount.WordCountPageParserImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

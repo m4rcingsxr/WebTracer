@@ -53,7 +53,7 @@ public final class WordCountPageParserFactoryImpl implements AbstractPageParserF
      * @throws NullPointerException if the {@code url} is {@code null}.
      */
     @Override
-    public PageParser createParserInstance(@NonNull final String url) {
+    public WordCountPageParserImpl createParserInstance(@NonNull final String url) {
         return new WordCountPageParserImpl(url, excludedPatterns, documentLoader);
     }
 

@@ -11,7 +11,7 @@ import java.util.*;
  * It is an immutable class and is intended to be built using its nested {@link Builder} class.
  */
 @Getter
-final class WordCountParseResult extends ParseResult {
+public final class WordCountParseResult extends ParseResult {
 
     /**
      * A map that holds the frequency of words found on the parsed web page.
