@@ -1,6 +1,5 @@
 package com.webtracer.main.crawler;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -16,7 +15,6 @@ import lombok.RequiredArgsConstructor;
  * encapsulating the final outcome of the crawling process.
  */
 @Getter
-@Builder(builderMethodName = "wordCountResultBuilder")
 @RequiredArgsConstructor
 public abstract class CrawlResult {
 

@@ -16,6 +16,7 @@ public final class SequentialWebCrawler implements WordCountWebCrawler {
     private final Clock clock;
     private final Duration crawlTimeout;
     private final int maxDepth;
+    private final int popularWordCount;
     private final List<Pattern> excludedUrls;
     private final WordCountPageParserFactoryImpl parserFactory;
 
@@ -28,8 +29,15 @@ public final class SequentialWebCrawler implements WordCountWebCrawler {
             crawlInternal(url, deadline, maxDepth, counts, visitedUrls);
         }
 
+        if (counts.isEmpty()) {
+            return WordCountResult.builder()
+                    .wordFrequencyMap(counts)
+                    .totalUrlsVisited(visitedUrls.size())
+                    .build();
+        }
+
         return WordCountResult.builder()
-                .wordFrequencyMap(counts)
+                .wordFrequencyMap(WordCountUtil.sort(counts, popularWordCount))
                 .totalUrlsVisited(visitedUrls.size())
                 .build();
     }
