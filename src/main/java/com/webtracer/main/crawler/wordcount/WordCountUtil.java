@@ -1,11 +1,9 @@
 package com.webtracer.main.crawler.wordcount;
 
+import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.PriorityQueue;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -41,31 +39,22 @@ final class WordCountUtil {
      * @param popularWordCount the number of top words to include in the result map.
      * @return a map containing the top {@code popularWordCount} words, sorted in the desired order.
      */
-    static Map<String, Integer> sort(Map<String, Integer> wordCounts, int popularWordCount) {
-        PriorityQueue<Map.Entry<String, Integer>> sortedCounts = new PriorityQueue<>(
-                wordCounts.size(),
-                Comparator.comparing(Map.Entry<String, Integer>::getValue)
-                        .reversed()
-                        .thenComparing(entry -> entry.getKey().length(), Comparator.reverseOrder())
-                        .thenComparing(Map.Entry::getKey)
-        );
+    static Map<String, Integer> sort(@NonNull Map<String, Integer> wordCounts, int popularWordCount) {
+        if(wordCounts.isEmpty()) return Collections.emptyMap();
 
-        sortedCounts.addAll(wordCounts.entrySet());
-
-        // Collect the top popularWordCount words into a LinkedHashMap to maintain order
-        return sortedCounts.stream()
-                .limit(Math.min(popularWordCount, wordCounts.size()))
+        return wordCounts.entrySet().stream()
                 .sorted(
                         Comparator.comparing(Map.Entry<String, Integer>::getValue)
                                 .reversed()
-                                .thenComparing(entry -> entry.getKey().length(),
-                                               Comparator.reverseOrder()
-                                )
+                                .thenComparing(entry -> entry.getKey().length(), Comparator.reverseOrder())
                                 .thenComparing(Map.Entry::getKey)
                 )
-                .collect(Collectors.toMap(Map.Entry::getKey,
-                                          Map.Entry::getValue,
-                                          Integer::sum, LinkedHashMap::new
+                .limit(popularWordCount)
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        Integer::sum,
+                        LinkedHashMap::new
                 ));
     }
 
