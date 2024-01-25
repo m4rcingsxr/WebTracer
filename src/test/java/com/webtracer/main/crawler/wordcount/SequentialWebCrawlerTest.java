@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.IOException;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -22,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class SequentialWebCrawlerUnitTest {
+class SequentialWebCrawlerTest {
 
     @Mock
     private Clock clock;
@@ -48,7 +49,7 @@ class SequentialWebCrawlerUnitTest {
     }
 
     @Test
-    void givenSingleUrl_whenCrawlIsCalled_thenReturnsCorrectWordCount() {
+    void givenSingleUrl_whenCrawlIsCalled_thenReturnsCorrectWordCount() throws IOException {
         // Given
         String url = "http://example.com";
         Instant now = Instant.now();
@@ -73,7 +74,7 @@ class SequentialWebCrawlerUnitTest {
     }
 
     @Test
-    void givenDepthLimit_whenCrawlIsCalled_thenRespectsDepthLimit() {
+    void givenDepthLimit_whenCrawlIsCalled_thenRespectsDepthLimit() throws IOException {
         // Given
         String url = "http://example.com";
         String linkedUrl = "http://example.com/linked";
@@ -101,7 +102,7 @@ class SequentialWebCrawlerUnitTest {
     }
 
     @Test
-    void givenTimeout_whenCrawlIsCalled_thenStopsAtTimeout() {
+    void givenTimeout_whenCrawlIsCalled_thenStopsAtTimeout() throws IOException {
         // Given
         String url = "http://example.com";
         Instant now = Instant.now();
@@ -127,7 +128,7 @@ class SequentialWebCrawlerUnitTest {
     }
 
     @Test
-    void givenExclusionPattern_whenCrawlIsCalled_thenExcludesMatchingUrls() {
+    void givenExclusionPattern_whenCrawlIsCalled_thenExcludesMatchingUrls() throws IOException {
         // Given
         String url = "http://example.com";
         excludedUrls.add(Pattern.compile(".*example.com.*"));
@@ -149,7 +150,7 @@ class SequentialWebCrawlerUnitTest {
     }
 
     @Test
-    void givenVisitedUrls_whenCrawlIsCalled_thenSkipsAlreadyVisitedUrls() {
+    void givenVisitedUrls_whenCrawlIsCalled_thenSkipsAlreadyVisitedUrls() throws IOException {
         // Given
         String url = "http://example.com";
         Instant now = Instant.now();
@@ -174,7 +175,7 @@ class SequentialWebCrawlerUnitTest {
     }
 
     @Test
-    void givenEmptyStartingUrls_whenCrawlIsCalled_thenReturnsEmptyResult() {
+    void givenEmptyStartingUrls_whenCrawlIsCalled_thenReturnsEmptyResult() throws IOException {
         // Given
         Instant now = Instant.now();
         when(clock.instant()).thenReturn(now);
@@ -194,7 +195,7 @@ class SequentialWebCrawlerUnitTest {
     }
 
     @Test
-    void givenMultipleStartingUrls_whenCrawlIsCalled_thenAggregatesWordCounts() {
+    void givenMultipleStartingUrls_whenCrawlIsCalled_thenAggregatesWordCounts() throws IOException {
         // Given
         String url1 = "http://example.com";
         String url2 = "http://example.org";
@@ -222,7 +223,8 @@ class SequentialWebCrawlerUnitTest {
     }
 
     @Test
-    void givenMultiplePages_whenCrawlIsCalled_thenAggregatesWordCountsAcrossPages() {
+    void givenMultiplePages_whenCrawlIsCalled_thenAggregatesWordCountsAcrossPages()
+            throws IOException {
         // Given
         String url1 = "http://example.com";
         String url2 = "http://example.org";
@@ -250,7 +252,8 @@ class SequentialWebCrawlerUnitTest {
     }
 
     @Test
-    void givenPopularWordCountLimit_whenCrawlIsCalled_thenLimitsResultToPopularWords() {
+    void givenPopularWordCountLimit_whenCrawlIsCalled_thenLimitsResultToPopularWords()
+            throws IOException {
         // Given
         String url = "http://example.com";
         Instant now = Instant.now();

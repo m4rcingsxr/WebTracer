@@ -1,5 +1,6 @@
 package com.webtracer.main.crawler.wordcount;
 
+import com.webtracer.main.ApiException;
 import com.webtracer.main.parser.wordcount.WordCountPageParserFactoryImpl;
 import com.webtracer.main.parser.wordcount.WordCountParseResult;
 import lombok.RequiredArgsConstructor;
@@ -60,8 +61,16 @@ public final class SequentialWebCrawler implements WordCountWebCrawler {
             return;
         }
 
+        WordCountParseResult result = null;
+        try {
+            result = parserFactory.createParserInstance(url).parse();
+        } catch (ApiException e) {
+
+            // malformed or not existing url, request timeout reached.
+            return;
+        }
+
         visitedUrls.add(url);
-        WordCountParseResult result = parserFactory.createParserInstance(url).parse();
         for (Map.Entry<String, Integer> e : result.getWordFrequencyMap().entrySet()) {
             if (counts.containsKey(e.getKey())) {
                 counts.put(e.getKey(), e.getValue() + counts.get(e.getKey()));

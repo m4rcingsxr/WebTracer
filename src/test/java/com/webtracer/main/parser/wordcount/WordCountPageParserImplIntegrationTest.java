@@ -5,6 +5,7 @@ import com.webtracer.main.parser.DocumentLoader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
@@ -24,7 +25,7 @@ class WordCountPageParserImplIntegrationTest {
     }
 
     @Test
-    void givenSimpleHtml_whenParse_thenCorrectWordCountAndLinks() {
+    void givenSimpleHtml_whenParse_thenCorrectWordCountAndLinks() throws IOException {
         String resourcePath = Path.of("src/test/resources/simple.html").toUri().toString();
         WordCountPageParserImpl parser = new WordCountPageParserImpl(resourcePath, excludePatterns,
                                                                      testDocumentLoader
@@ -39,7 +40,7 @@ class WordCountPageParserImplIntegrationTest {
     }
 
     @Test
-    void givenComplexHtml_whenParse_thenCorrectWordCountAndLinks() {
+    void givenComplexHtml_whenParse_thenCorrectWordCountAndLinks() throws IOException {
         String resourcePath = Path.of("src/test/resources/complex.html").toUri().toString();
         WordCountPageParserImpl parser = new WordCountPageParserImpl(resourcePath, excludePatterns,
                                                                      testDocumentLoader
@@ -60,7 +61,7 @@ class WordCountPageParserImplIntegrationTest {
     }
 
     @Test
-    void givenEmptyHtml_whenParse_thenEmptyResult() {
+    void givenEmptyHtml_whenParse_thenEmptyResult() throws IOException {
         String resourcePath = Path.of("src/test/resources/empty.html").toUri().toString();
         WordCountPageParserImpl parser = new WordCountPageParserImpl(resourcePath, excludePatterns,
                                                                      testDocumentLoader
@@ -73,7 +74,7 @@ class WordCountPageParserImplIntegrationTest {
     }
 
     @Test
-    void givenInvalidHtml_whenParse_thenCorrectWordCount() {
+    void givenInvalidHtml_whenParse_thenCorrectWordCount() throws IOException {
         String resourcePath = Path.of("src/test/resources/invalid.html").toUri().toString();
         WordCountPageParserImpl parser = new WordCountPageParserImpl(resourcePath, excludePatterns,
                                                                      testDocumentLoader
@@ -91,7 +92,8 @@ class WordCountPageParserImplIntegrationTest {
     }
 
     @Test
-    void givenHtmlWithSpecialCharacters_whenParse_thenCorrectWordCountAndLinks() {
+    void givenHtmlWithSpecialCharacters_whenParse_thenCorrectWordCountAndLinks()
+            throws IOException {
         String resourcePath = Path.of("src/test/resources/special_characters.html").toUri().toString();
         WordCountPageParserImpl parser = new WordCountPageParserImpl(resourcePath, excludePatterns, testDocumentLoader);
 
@@ -105,7 +107,7 @@ class WordCountPageParserImplIntegrationTest {
     }
 
     @Test
-    void givenLargeHtml_whenParse_thenCorrectWordCountAndLinks() {
+    void givenLargeHtml_whenParse_thenCorrectWordCountAndLinks() throws IOException {
         String resourcePath = Path.of("src/test/resources/large.html").toUri().toString();
         WordCountPageParserImpl parser = new WordCountPageParserImpl(resourcePath, excludePatterns, testDocumentLoader);
 
@@ -116,7 +118,7 @@ class WordCountPageParserImplIntegrationTest {
     }
 
     @Test
-    void givenHtmlWithNestedLinks_whenParse_thenCorrectWordCountAndLinks() {
+    void givenHtmlWithNestedLinks_whenParse_thenCorrectWordCountAndLinks() throws IOException {
         String resourcePath = Path.of("src/test/resources/nested_links.html").toUri().toString();
         WordCountPageParserImpl parser = new WordCountPageParserImpl(resourcePath, excludePatterns, testDocumentLoader);
 

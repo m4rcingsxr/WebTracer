@@ -1,5 +1,6 @@
 package com.webtracer.main.parser.wordcount;
 
+import com.webtracer.main.ApiException;
 import com.webtracer.main.parser.DocumentLoader;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -41,7 +42,7 @@ public final class WordCountPageParserImpl implements WordCountPageParser {
      * @return the result of parsing the HTML page, including word frequencies and hyperlinks
      */
     @Override
-    public WordCountParseResult parse() {
+    public WordCountParseResult parse() throws ApiException {
         Optional<URI> uriOpt = parseURI(pageUri);
         if (uriOpt.isEmpty()) {
             return new WordCountParseResult.Builder().build();
@@ -49,11 +50,8 @@ public final class WordCountPageParserImpl implements WordCountPageParser {
 
         URI uri = uriOpt.get();
         Optional<Document> documentOpt;
-        try {
-            documentOpt = documentLoader.loadDocument(uri);
-        } catch (IOException e) {
-            return new WordCountParseResult.Builder().build();
-        }
+        documentOpt = documentLoader.loadDocument(uri);
+
 
         if (documentOpt.isEmpty()) {
             return new WordCountParseResult.Builder().build();

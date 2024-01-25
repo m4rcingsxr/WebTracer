@@ -2,6 +2,8 @@ package com.webtracer.main.parser.wordcount;
 
 import com.webtracer.main.parser.PageParser;
 
+import java.io.IOException;
+
 /**
  * The WordCountPageParser interface extends the {@link PageParser} interface,
  * specifying that the parser will return a {@link WordCountParseResult} object.

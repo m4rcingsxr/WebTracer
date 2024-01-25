@@ -1,5 +1,7 @@
 package com.webtracer.main.parser;
 
+import java.io.IOException;
+
 /**
  * The PageParser interface defines the contract for classes that are responsible for parsing web pages.
  * Implementations of this interface should provide the logic for extracting data from web pages
@@ -13,6 +15,6 @@ public interface PageParser {
      * @return a {@link ParseResult} object containing the results of the parsing operation.
      *         The exact type of the returned result depends on the implementation.
      */
-    ParseResult parse();
+    ParseResult parse() throws IOException;
 
 }

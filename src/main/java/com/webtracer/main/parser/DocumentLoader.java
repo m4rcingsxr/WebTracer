@@ -1,5 +1,6 @@
 package com.webtracer.main.parser;
 
+import com.webtracer.main.ApiException;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
@@ -11,5 +12,5 @@ import java.util.Optional;
  * This allows for injecting different loading strategies for testing purposes.
  */
 public interface DocumentLoader {
-    Optional<Document> loadDocument(URI uri) throws IOException;
+    Optional<Document> loadDocument(URI uri) throws ApiException;
 }

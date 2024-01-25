@@ -1,5 +1,6 @@
 package com.webtracer.main.parser.wordcount;
 
+import com.webtracer.main.ApiException;
 import com.webtracer.main.parser.DocumentLoader;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,6 +8,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -45,21 +48,6 @@ class WordCountPageParserImplTest {
     }
 
     @Test
-    void givenIOExceptionDuringDocumentLoading_whenParse_thenReturnsEmptyResult() throws IOException {
-        // Given
-        when(documentLoaderMock.loadDocument(any(URI.class))).thenThrow(new IOException());
-
-        WordCountPageParserImpl parser = new WordCountPageParserImpl(pageUri, excludePatterns, documentLoaderMock);
-
-        // When
-        WordCountParseResult result = parser.parse();
-
-        // Then
-        assertTrue(result.getWordFrequencyMap().isEmpty());
-        assertTrue(result.getHyperLinkList().isEmpty());
-    }
-
-    @Test
     void givenEmptyDocument_whenParse_thenReturnsEmptyResult() throws IOException {
         // Given
         Document emptyDocument = mock(Document.class);
@@ -89,4 +77,5 @@ class WordCountPageParserImplTest {
         assertTrue(result.getWordFrequencyMap().isEmpty());
         assertTrue(result.getHyperLinkList().isEmpty());
     }
+
 }
