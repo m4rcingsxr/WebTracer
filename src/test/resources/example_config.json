@@ -1,0 +1,10 @@
+{
+  "initialPages": ["http://example.com"],
+  "excludedUrls": [],
+  "excludedWords": [],
+  "customImplementation": "",
+  "maxDepth": 5,
+  "timeoutSeconds": 120,
+  "popularWordCount": 10,
+  "crawlResultPath": "/path/to/results.json"
+}

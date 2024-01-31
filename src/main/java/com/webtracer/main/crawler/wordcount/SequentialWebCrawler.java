@@ -1,7 +1,10 @@
 package com.webtracer.main.crawler.wordcount;
 
+import com.google.inject.Inject;
 import com.webtracer.main.ApiException;
-import com.webtracer.main.parser.wordcount.WordCountPageParserFactoryImpl;
+import com.webtracer.main.di.annotation.*;
+import com.webtracer.main.parser.AbstractPageParserFactory;
+import com.webtracer.main.parser.ParseResult;
 import com.webtracer.main.parser.wordcount.WordCountParseResult;
 import lombok.RequiredArgsConstructor;
 
@@ -36,7 +39,24 @@ public final class SequentialWebCrawler implements WordCountWebCrawler {
     private final List<Pattern> excludedUrls;
 
     // Factory to create page parsers specific to the word count functionality.
-    private final WordCountPageParserFactoryImpl parserFactory;
+    private final AbstractPageParserFactory parserFactory;
+
+    @Inject
+    SequentialWebCrawler(
+            Clock clock,
+            @WordCountFactory AbstractPageParserFactory parserFactory,
+            @CrawlTimeout Duration crawlTimeout,
+            @PopularWordCount int popularWordCount,
+            @CrawlMaxDepth int maxDepth,
+            @ExcludedUrls List<Pattern> excludedUrls
+    ) {
+        this.clock = clock;
+        this.crawlTimeout = crawlTimeout;
+        this.popularWordCount = popularWordCount;
+        this.maxDepth = maxDepth;
+        this.excludedUrls = excludedUrls;
+        this.parserFactory = parserFactory;
+    }
 
     /**
      * Starts the crawling process from the given list of starting URLs.
@@ -112,7 +132,7 @@ public final class SequentialWebCrawler implements WordCountWebCrawler {
             return;
         }
 
-        WordCountParseResult result = null;
+        ParseResult result = null;
         try {
 
             // Attempt to parse the page and retrieve the word count results.
@@ -128,7 +148,7 @@ public final class SequentialWebCrawler implements WordCountWebCrawler {
         visitedUrls.add(url);
 
         // Accumulate the word counts from the parsed result.
-        for (Map.Entry<String, Integer> e : result.getWordFrequencyMap().entrySet()) {
+        for (Map.Entry<String, Integer> e : ((WordCountParseResult)result).getWordFrequencyMap().entrySet()) {
             counts.merge(e.getKey(), e.getValue(), Integer::sum);
         }
 

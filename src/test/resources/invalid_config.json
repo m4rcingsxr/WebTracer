@@ -1,0 +1,4 @@
+{
+  "initialPages": ["http://example.com"],
+  "maxDepth": 5,
+  "timeoutSeconds": 120,

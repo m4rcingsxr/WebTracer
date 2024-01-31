@@ -17,7 +17,6 @@ import java.lang.annotation.RetentionPolicy;
  * The annotation is retained at runtime to allow the dependency injection
  * framework to use it during the injection process.
  */
-@BindingAnnotation
 @Qualifier
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CrawlMaxDepth {

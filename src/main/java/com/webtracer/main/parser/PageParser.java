@@ -1,5 +1,7 @@
 package com.webtracer.main.parser;
 
+import com.webtracer.main.ApiException;
+
 import java.io.IOException;
 
 /**
@@ -15,6 +17,6 @@ public interface PageParser {
      * @return a {@link ParseResult} object containing the results of the parsing operation.
      *         The exact type of the returned result depends on the implementation.
      */
-    ParseResult parse() throws IOException;
+    ParseResult parse() throws ApiException;
 
 }
