@@ -40,7 +40,7 @@ class CrawlerModuleTest {
     @Test
     void givenSequentialWebCrawler_whenInjected_thenShouldBeInstanceOfSequentialWebCrawler() {
         GenericWebCrawler crawler = injector.getInstance(
-                Key.get(GenericWebCrawler.class, CrawlerModule.Internal.class));
+                Key.get(GenericWebCrawler.class));
 
         assertInstanceOf(SequentialWebCrawler.class, crawler);
 
@@ -54,7 +54,7 @@ class CrawlerModuleTest {
     @Test
     void givenCrawlerModule_whenWordCountFactoryIsInjected_thenShouldProvideWordCountPageParserFactoryImpl() throws NoSuchFieldException, IllegalAccessException {
         GenericWebCrawler crawler = injector.getInstance(
-                Key.get(GenericWebCrawler.class, CrawlerModule.Internal.class));
+                Key.get(GenericWebCrawler.class));
 
         Field factoryField = SequentialWebCrawler.class.getDeclaredField("parserFactory");
         factoryField.setAccessible(true);
@@ -87,7 +87,7 @@ class CrawlerModuleTest {
 
         injector = Guice.createInjector(new CrawlerModule(config));
         GenericWebCrawler crawler = injector.getInstance(
-                Key.get(GenericWebCrawler.class, CrawlerModule.Internal.class));
+                Key.get(GenericWebCrawler.class));
 
         assertNotNull(crawler);
         assertInstanceOf(SequentialWebCrawler.class, crawler);
@@ -112,6 +112,6 @@ class CrawlerModuleTest {
 
         injector = Guice.createInjector(new CrawlerModule(config));
 
-        assertThrows(ConfigurationException.class, () -> injector.getInstance(GenericWebCrawler.class));
+        assertThrows(ProvisionException.class, () -> injector.getInstance(GenericWebCrawler.class));
     }
 }

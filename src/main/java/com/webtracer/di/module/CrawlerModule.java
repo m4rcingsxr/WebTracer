@@ -6,8 +6,6 @@ import com.webtracer.config.WebCrawlerConfig;
 import com.webtracer.crawler.GenericWebCrawler;
 import com.webtracer.crawler.wordcount.SequentialWebCrawler;
 import com.webtracer.di.annotation.*;
-import com.webtracer.parser.AbstractPageParserFactory;
-import com.webtracer.parser.wordcount.WordCountPageParserFactoryImpl;
 import jakarta.inject.Qualifier;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +27,7 @@ public class CrawlerModule extends AbstractModule {
     @Override
     protected void configure() {
         Multibinder<GenericWebCrawler> multibinder =
-                Multibinder.newSetBinder(binder(), GenericWebCrawler.class, Internal.class);
+                Multibinder.newSetBinder(binder(), GenericWebCrawler.class);
         multibinder.addBinding().to(SequentialWebCrawler.class);
 
         bind(Clock.class).toInstance(Clock.systemUTC());
@@ -50,11 +48,11 @@ public class CrawlerModule extends AbstractModule {
 
     @Provides
     @Singleton
-    @Internal
     GenericWebCrawler provideRawWebCrawler(
-            @Internal Set<GenericWebCrawler> implementations) {
+            Set<GenericWebCrawler> implementations) {
 
         String override = config.getCustomImplementation();
+        System.out.println(override);
 
         if (override.isEmpty()) {
             throw new IllegalStateException("Implementation has not been set");
@@ -71,8 +69,4 @@ public class CrawlerModule extends AbstractModule {
         return crawler;
     }
 
-    @Qualifier
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface Internal {
-    }
 }
