@@ -1,12 +1,16 @@
 package com.webtracer.crawler;
 
 
+import com.webtracer.ApiException;
+
 import java.util.List;
 
+
 /**
- * This interface defines a generic web crawler that can be implemented to perform web crawling tasks.
- * The crawler is initialized with a list of starting URLs and processes the web pages to extract the
- * desired information. The result of the crawl is encapsulated in a {@link CrawlResult} object.
+ * The {@link GenericWebCrawler} interface defines the contract for a generic web crawler
+ * that can be implemented to perform various web crawling tasks. The crawler is initialized
+ * with a list of starting URLs and processes the web pages to extract the desired information.
+ * The result of the crawl is encapsulated in a {@link CrawlResult} object.
  */
 public interface GenericWebCrawler {
 
@@ -19,17 +23,19 @@ public interface GenericWebCrawler {
      *                    entry points for the crawler.
      * @return a {@link CrawlResult} object containing the outcome of the crawl, including any data
      *         extracted from the web pages and any errors encountered during the process.
+     * @throws ApiException if an error occurs during the crawling process, such as network issues,
+     *                      parsing errors, or unexpected response formats.
      */
-    CrawlResult crawl(List<String> initialUrls);
+    CrawlResult crawl(List<String> initialUrls) throws ApiException;
 
     /**
      * Returns the maximum concurrency level supported by this web crawler, which is typically
      * determined by the number of available CPU cores. This method provides a default implementation
      * that returns the number of processors available to the Java Virtual Machine.
      *
-     * The maximum concurrency level can be used by implementations to optimize the crawling process
+     * <p>The maximum concurrency level can be used by implementations to optimize the crawling process
      * by running multiple threads in parallel, thereby improving the efficiency and speed of the
-     * crawling task.
+     * crawling task.</p>
      *
      * @return the maximum number of parallel threads that can be used by the crawler, based on the
      *         number of available CPU cores.

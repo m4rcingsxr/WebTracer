@@ -1,6 +1,7 @@
 package com.webtracer.crawler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.webtracer.ApiException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -39,14 +40,16 @@ public final class CrawlResultSerializer<T extends CrawlResult> {
      * be overwritten.</p>
      *
      * @param outputPath the path to the file where the serialized crawl result should be written.
-     * @throws IOException if an I/O error occurs during writing to the file.
+     * @throws ApiException if an I/O error occurs during writing to the file.
      * @throws NullPointerException if {@code outputPath} is {@code null}.
      */
-    public void saveToPath(Path outputPath) throws IOException {
+    public void saveToPath(Path outputPath) throws ApiException {
         Objects.requireNonNull(outputPath, "Output path cannot be null");
 
         try (BufferedWriter writer = Files.newBufferedWriter(outputPath)) {
             saveToWriter(writer);
+        } catch (IOException e) {
+            throw new ApiException("Failed to save crawl result to path: " + outputPath, e);
         }
     }
 
@@ -58,14 +61,18 @@ public final class CrawlResultSerializer<T extends CrawlResult> {
      * other type of {@link Writer}.</p>
      *
      * @param outputWriter the writer where the serialized crawl result should be written.
-     * @throws IOException if an I/O error occurs during writing to the writer.
+     * @throws ApiException if an I/O error occurs during writing to the writer.
      * @throws NullPointerException if {@code outputWriter} is {@code null}.
      */
-    public void saveToWriter(Writer outputWriter) throws IOException {
+    public void saveToWriter(Writer outputWriter) throws ApiException {
         Objects.requireNonNull(outputWriter, "Output writer cannot be null");
 
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.writeValue(outputWriter, result);
+        try {
+            objectMapper.writeValue(outputWriter, result);
+        } catch (IOException e) {
+            throw new ApiException("Failed to serialize crawl result to writer", e);
+        }
     }
 
 }

@@ -15,10 +15,14 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 /**
- * The {@code SequentialWebCrawler} class is responsible for crawling web pages in a sequential manner,
- * starting from a list of URLs and following links found on those pages up to a specified depth.
- * It counts the frequency of words on the pages it visits, excluding certain URLs based on predefined patterns.
- * The results of the crawl include the most popular words and the total number of URLs visited.
+ * The {@code SequentialWebCrawler} class is a concrete implementation of the {@link WordCountWebCrawler}
+ * interface, responsible for crawling web pages in a sequential manner, starting from a list of URLs
+ * and following links found on those pages up to a specified depth.
+ * <p>
+ * This crawler counts the frequency of words on the pages it visits, excluding certain URLs based on
+ * predefined patterns. The results of the crawl include the most popular words and the total number
+ * of URLs visited.
+ * </p>
  */
 @RequiredArgsConstructor
 public final class SequentialWebCrawler implements WordCountWebCrawler {
@@ -65,9 +69,11 @@ public final class SequentialWebCrawler implements WordCountWebCrawler {
      *
      * @param startingUrls the list of initial URLs to start crawling from.
      * @return a {@link WordCountResult} object containing the most popular words and the total URLs visited.
+     * @throws ApiException if an error occurs during the crawling process, such as network issues,
+     *                      parsing errors, or unexpected response formats.
      */
     @Override
-    public WordCountResult crawl(List<String> startingUrls) {
+    public WordCountResult crawl(List<String> startingUrls) throws ApiException {
 
         // Determine the deadline by adding the crawl timeout to the current time.
         Instant deadline = clock.instant().plus(crawlTimeout);

@@ -1,6 +1,7 @@
 package com.webtracer.parser.wordcount;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
@@ -33,6 +34,7 @@ import java.util.regex.Pattern;
  * <p> The class is not designed to be used independently; rather, it is a utility component
  * within a broader HTML parsing framework.</p>
  */
+@RequiredArgsConstructor
 final class WordCountNodeProcessor {
 
     /**
@@ -62,20 +64,6 @@ final class WordCountNodeProcessor {
      */
     @NonNull
     private final URI pageUri;
-
-    /**
-     * Constructor for the WordCountNodeProcessor. It initializes the processor with the exclude patterns,
-     * the result builder, and the URI of the page.
-     *
-     * @param excludeWordPatterns List of patterns to exclude certain words.
-     * @param resultBuilder The builder used to accumulate results.
-     * @param pageUri The URI of the page being processed.
-     */
-    WordCountNodeProcessor(List<Pattern> excludeWordPatterns, WordCountParseResult.Builder resultBuilder, URI pageUri) {
-        this.excludeWordPatterns = excludeWordPatterns;
-        this.resultBuilder = resultBuilder;
-        this.pageUri = pageUri;
-    }
 
     /**
      * Processes a node in the HTML document. Depending on the type of node, it delegates to either

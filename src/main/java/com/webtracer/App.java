@@ -10,6 +10,7 @@ import com.webtracer.crawler.GenericWebCrawler;
 import com.webtracer.di.module.CrawlerModule;
 
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -30,28 +31,40 @@ public class App {
             return;
         }
 
-        WebCrawlerConfig config = new ConfigFileLoader(Path.of(args[0])).fetchConfig();
-        new App(config).run();
+        try {
+            WebCrawlerConfig config = new ConfigFileLoader(Path.of(args[0])).fetchConfig();
+            new App(config).run();
+        } catch(ApiException e) {
+            e.printStackTrace();
+        }
+
     }
 
-    private void run() throws Exception {
+    private void run() throws ApiException {
+        // Inject dependencies using Guice
         Guice.createInjector(new CrawlerModule(config)).injectMembers(this);
 
+        // Perform the crawling operation
         CrawlResult result = crawler.crawl(config.getInitialPages());
         CrawlResultSerializer<CrawlResult> resultWriter = new CrawlResultSerializer<>(result);
 
         String resultPath = config.getCrawlResultPath();
-        System.out.println(resultPath);
 
-        if(resultPath != null && !resultPath.isEmpty()) {
+        // Handle writing the result to the specified file path or console
+        if (resultPath != null && !resultPath.isEmpty()) {
             try (FileWriter fileWriter = new FileWriter(resultPath)) {
                 resultWriter.saveToWriter(fileWriter);
+            } catch (IOException e) {
+                throw new ApiException("Failed to write crawl result to file: " + resultPath, e);
             }
         } else {
             try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(System.out)) {
                 resultWriter.saveToWriter(outputStreamWriter);
+            } catch (IOException e) {
+                throw new ApiException("Failed to write crawl result to console", e);
             }
         }
+
     }
 
 }

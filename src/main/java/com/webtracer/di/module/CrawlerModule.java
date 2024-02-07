@@ -5,13 +5,13 @@ import com.google.inject.multibindings.Multibinder;
 import com.webtracer.config.WebCrawlerConfig;
 import com.webtracer.crawler.GenericWebCrawler;
 import com.webtracer.crawler.wordcount.SequentialWebCrawler;
-import com.webtracer.di.annotation.*;
-import jakarta.inject.Qualifier;
+import com.webtracer.di.annotation.CrawlMaxDepth;
+import com.webtracer.di.annotation.CrawlTimeout;
+import com.webtracer.di.annotation.ExcludedUrls;
+import com.webtracer.di.annotation.PopularWordCount;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.time.Clock;
 import java.time.Duration;
 import java.util.List;

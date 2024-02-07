@@ -1,6 +1,7 @@
 package com.webtracer.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.webtracer.ApiException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -14,6 +15,7 @@ import java.nio.file.Path;
  * <p>
  * This class provides functionality to load a {@link WebCrawlerConfig} from a specified file path,
  * ensuring that the configuration is correctly parsed and made available to the application.
+ * It supports both file-based and in-memory configuration content.
  * </p>
  */
 @RequiredArgsConstructor
@@ -38,11 +40,13 @@ public final class ConfigFileLoader {
      * </p>
      *
      * @return the loaded {@link WebCrawlerConfig} object containing the crawler configuration.
-     * @throws IOException if there is an issue reading the file or parsing the JSON content.
+     * @throws ApiException if there is an issue reading the file or parsing the JSON content.
      */
-    public WebCrawlerConfig fetchConfig() throws IOException {
+    public WebCrawlerConfig fetchConfig() throws ApiException {
         try (FileReader fileReader = new FileReader(path.toFile())) {
             return read(fileReader);
+        } catch (IOException e) {
+            throw new ApiException("Failed to load configuration from file: " + path, e);
         }
     }
 
@@ -56,10 +60,14 @@ public final class ConfigFileLoader {
      *
      * @param configReader a {@link Reader} pointing to a JSON string that contains the crawler configuration.
      * @return a {@link WebCrawlerConfig} object populated with values parsed from the JSON content.
-     * @throws IOException if there is an issue parsing the JSON content.
+     * @throws ApiException if there is an issue parsing the JSON content.
      */
-    public static WebCrawlerConfig read(Reader configReader) throws IOException {
+    public static WebCrawlerConfig read(Reader configReader) throws ApiException {
         ObjectMapper jsonMapper = new ObjectMapper();
-        return jsonMapper.readValue(configReader, WebCrawlerConfig.class);
+        try {
+            return jsonMapper.readValue(configReader, WebCrawlerConfig.class);
+        } catch (IOException e) {
+            throw new ApiException("Failed to parse configuration from provided reader", e);
+        }
     }
 }
