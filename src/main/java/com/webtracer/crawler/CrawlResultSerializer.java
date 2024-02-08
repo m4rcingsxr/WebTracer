@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.webtracer.ApiException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -24,6 +25,7 @@ import java.util.Objects;
  *            with any subclass of {@link CrawlResult}.
  */
 @RequiredArgsConstructor
+@Slf4j
 public final class CrawlResultSerializer<T extends CrawlResult> {
 
     /**
@@ -45,10 +47,12 @@ public final class CrawlResultSerializer<T extends CrawlResult> {
      */
     public void saveToPath(Path outputPath) throws ApiException {
         Objects.requireNonNull(outputPath, "Output path cannot be null");
+        log.debug("Saving crawl result to path: {}", outputPath);
 
         try (BufferedWriter writer = Files.newBufferedWriter(outputPath)) {
             saveToWriter(writer);
         } catch (IOException e) {
+            log.error("Failed to save crawl result to path: {}", outputPath, e);
             throw new ApiException("Failed to save crawl result to path: " + outputPath, e);
         }
     }
@@ -66,11 +70,14 @@ public final class CrawlResultSerializer<T extends CrawlResult> {
      */
     public void saveToWriter(Writer outputWriter) throws ApiException {
         Objects.requireNonNull(outputWriter, "Output writer cannot be null");
+        log.debug("Serializing crawl result to writer");
 
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             objectMapper.writeValue(outputWriter, result);
+            log.info("Crawl result successfully serialized");
         } catch (IOException e) {
+            log.error("Failed to serialize crawl result to writer", e);
             throw new ApiException("Failed to serialize crawl result to writer", e);
         }
     }

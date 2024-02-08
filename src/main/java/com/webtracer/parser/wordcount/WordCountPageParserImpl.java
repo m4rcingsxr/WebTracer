@@ -6,6 +6,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.A;
 import org.jsoup.nodes.Document;
 
 import java.net.URI;
@@ -23,6 +25,7 @@ import java.util.regex.Pattern;
  */
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+@Slf4j
 public final class WordCountPageParserImpl implements WordCountPageParser {
 
     @NonNull
@@ -42,21 +45,27 @@ public final class WordCountPageParserImpl implements WordCountPageParser {
      */
     @Override
     public WordCountParseResult parse() throws ApiException {
+        log.info("Starting to parse the page: {}", pageUri);
+
         Optional<URI> uriOpt = parseURI(pageUri);
         if (uriOpt.isEmpty()) {
+            log.warn("Failed to parse URI: {}", pageUri);
             return new WordCountParseResult.Builder().build();
         }
 
         URI uri = uriOpt.get();
+        log.debug("Parsed URI: {}", uri);
+
         Optional<Document> documentOpt;
         documentOpt = documentLoader.loadDocument(uri);
 
-
         if (documentOpt.isEmpty()) {
+            log.warn("Failed to load document from URI: {}", uri);
             return new WordCountParseResult.Builder().build();
         }
 
         Document document = documentOpt.get();
+        log.debug("Loaded document from URI: {}", uri);
 
         WordCountParseResult.Builder resultBuilder = new WordCountParseResult.Builder();
         WordCountNodeProcessor nodeProcessor = new WordCountNodeProcessor(excludeWordPatterns, resultBuilder, uri);
@@ -64,6 +73,7 @@ public final class WordCountPageParserImpl implements WordCountPageParser {
         // Traverse the document and process each node, builder accessed by single thread
         document.traverse(nodeProcessor::processNode);
 
+        log.info("Finished parsing the page: {}", pageUri);
         return nodeProcessor.getResult();
     }
 
@@ -76,8 +86,11 @@ public final class WordCountPageParserImpl implements WordCountPageParser {
      */
     private Optional<URI> parseURI(String uriString) {
         try {
-            return Optional.of(new URI(uriString));
+            URI uri = new URI(uriString);
+            log.debug("Successfully parsed URI: {}", uriString);
+            return Optional.of(uri);
         } catch (URISyntaxException e) {
+            log.error("Failed to parse URI: {}", uriString, e);
             return Optional.empty();
         }
     }

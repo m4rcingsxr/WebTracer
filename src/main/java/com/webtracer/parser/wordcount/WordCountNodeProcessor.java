@@ -2,6 +2,7 @@ package com.webtracer.parser.wordcount;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
@@ -35,6 +36,7 @@ import java.util.regex.Pattern;
  * within a broader HTML parsing framework.</p>
  */
 @RequiredArgsConstructor
+@Slf4j
 final class WordCountNodeProcessor {
 
     /**
@@ -73,6 +75,7 @@ final class WordCountNodeProcessor {
      * @param depth The depth of the node in the document tree (unused in this implementation).
      */
     void processNode(Node node, int depth) {
+        log.trace("Processing node at depth {}: {}", depth, node.nodeName());
         if (node instanceof TextNode textNode) {
             processTextNode(textNode);
         } else if (node instanceof Element element) {
@@ -87,16 +90,18 @@ final class WordCountNodeProcessor {
      * @param textNode The text node to process.
      */
     void processTextNode(TextNode textNode) {
-        // Strip leading and trailing whitespace from the text
         String text = textNode.text().strip();
+        log.trace("Processing text node: {}", text);
 
-        // Split the text into words, filter them, clean them up, and add to the result
         Arrays.stream(WHITESPACE_PATTERN.split(text))
-                .filter(s -> !s.isBlank()) // Filter out blank strings
-                .filter(s -> excludeWordPatterns.stream().noneMatch(p -> p.matcher(s).matches())) // Apply exclusion patterns
-                .map(s -> NON_WORD_PATTERN.matcher(s).replaceAll("")) // Remove non-word characters
-                .map(String::toLowerCase) // Convert words to lowercase
-                .forEach(resultBuilder::addWord); // Add each word to the result builder
+                .filter(s -> !s.isBlank())
+                .filter(s -> excludeWordPatterns.stream().noneMatch(p -> p.matcher(s).matches()))
+                .map(s -> NON_WORD_PATTERN.matcher(s).replaceAll(""))
+                .map(String::toLowerCase)
+                .forEach(word -> {
+                    log.trace("Adding word to result: {}", word);
+                    resultBuilder.addWord(word);
+                });
     }
 
     /**
@@ -106,10 +111,10 @@ final class WordCountNodeProcessor {
      * @param element The element to process.
      */
     void processElement(Element element) {
-        // Check if the element is an anchor tag (<a>) with an href attribute
+        log.trace("Processing element: {}", element.tagName());
         if (element.is(new Evaluator.Tag("a")) && element.hasAttr("href")) {
-            // Resolve the link and add it to the result
             String link = resolveLink(element);
+            log.trace("Resolved hyperlink: {}", link);
             resultBuilder.addLink(link);
         }
     }
@@ -124,24 +129,22 @@ final class WordCountNodeProcessor {
     String resolveLink(Element element) {
         String href = element.attr("href");
 
-        // If href is a fully qualified URL (starts with http://, https://), return it as is
         if (href.startsWith("http://") || href.startsWith("https://")) {
+            log.trace("Returning fully qualified URL: {}", href);
             return href;
         }
 
-        // Handle local file URLs
         if (isLocalUri(pageUri)) {
             Path basePath = Path.of(pageUri).getParent();
-            if (href.startsWith("/")) {
-                // Convert absolute paths to file URIs
-                return basePath.resolve(href.substring(1)).toUri().toString();
-            } else {
-                // Convert relative paths to file URIs
-                return basePath.resolve(href).toUri().toString();
-            }
+            String resolvedLink = href.startsWith("/")
+                    ? basePath.resolve(href.substring(1)).toUri().toString()
+                    : basePath.resolve(href).toUri().toString();
+            log.trace("Resolved local file URL: {}", resolvedLink);
+            return resolvedLink;
         } else {
-            // For remote URIs, let Jsoup resolve relative URLs
-            return element.attr("abs:href");
+            String resolvedLink = element.attr("abs:href");
+            log.trace("Resolved remote URL: {}", resolvedLink);
+            return resolvedLink;
         }
     }
 
@@ -152,7 +155,9 @@ final class WordCountNodeProcessor {
      * @return true if the URI represents a local file, false otherwise.
      */
     boolean isLocalUri(URI uri) {
-        return "file".equals(uri.getScheme());
+        boolean isLocal = "file".equals(uri.getScheme());
+        log.trace("URI {} is local: {}", uri, isLocal);
+        return isLocal;
     }
 
     /**
@@ -161,6 +166,7 @@ final class WordCountNodeProcessor {
      * @return The final result as a {@link WordCountParseResult}.
      */
     WordCountParseResult getResult() {
+        log.debug("Building final WordCountParseResult");
         return resultBuilder.build();
     }
 }

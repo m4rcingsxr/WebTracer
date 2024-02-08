@@ -4,9 +4,9 @@ import com.webtracer.crawler.CrawlResult;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
-
 
 /**
  * The {@code WordCountResult} class represents the result of a web crawling operation specifically
@@ -22,6 +22,7 @@ import java.util.Map;
  * way to access the results of a word count-focused web crawl.
  */
 @Getter
+@Slf4j
 public final class WordCountResult extends CrawlResult {
 
     /**
@@ -43,5 +44,8 @@ public final class WordCountResult extends CrawlResult {
     public WordCountResult(int totalUrlsVisited, @NonNull Map<String, Integer> wordFrequencyMap) {
         super(totalUrlsVisited);
         this.wordFrequencyMap = wordFrequencyMap;
+
+        log.debug("WordCountResult created with totalUrlsVisited = {} and wordFrequencyMap = {}",
+                  totalUrlsVisited, wordFrequencyMap);
     }
 }

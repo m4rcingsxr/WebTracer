@@ -7,6 +7,7 @@ import com.webtracer.parser.AbstractPageParserFactory;
 import com.webtracer.parser.ParseResult;
 import com.webtracer.parser.wordcount.WordCountParseResult;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.Clock;
 import java.time.Duration;
@@ -25,6 +26,7 @@ import java.util.regex.Pattern;
  * </p>
  */
 @RequiredArgsConstructor
+@Slf4j
 public final class SequentialWebCrawler implements WordCountWebCrawler {
 
     // Clock instance to manage time-based operations, useful for testing with fixed or custom clocks.
@@ -74,30 +76,26 @@ public final class SequentialWebCrawler implements WordCountWebCrawler {
      */
     @Override
     public WordCountResult crawl(List<String> startingUrls) throws ApiException {
+        log.info("Starting crawl with {} starting URLs", startingUrls.size());
 
-        // Determine the deadline by adding the crawl timeout to the current time.
         Instant deadline = clock.instant().plus(crawlTimeout);
-
-        // Map to hold word counts across all visited pages.
         Map<String, Integer> counts = new HashMap<>();
-
-        // Set to keep track of URLs that have been visited to avoid reprocessing them.
         Set<String> visitedUrls = new HashSet<>();
 
-        // Iterate over each starting URL and begin the crawling process.
         for (String url : startingUrls) {
+            log.debug("Crawling URL: {}", url);
             crawlInternal(url, deadline, maxDepth, counts, visitedUrls);
         }
 
-        // If no words were counted, return a result with an empty word frequency map.
         if (counts.isEmpty()) {
+            log.warn("No words counted during the crawl");
             return WordCountResult.builder()
                     .wordFrequencyMap(counts)
                     .totalUrlsVisited(visitedUrls.size())
                     .build();
         }
 
-        // Return the results with the sorted word frequencies and the total number of URLs visited.
+        log.info("Crawl completed with {} URLs visited", visitedUrls.size());
         return WordCountResult.builder()
                 .wordFrequencyMap(WordCountUtil.sort(counts, popularWordCount))
                 .totalUrlsVisited(visitedUrls.size())
@@ -119,48 +117,38 @@ public final class SequentialWebCrawler implements WordCountWebCrawler {
             Instant deadline,
             int maxDepth,
             Map<String, Integer> counts,
-            Set<String> visitedUrls) {
+            Set<String> visitedUrls) throws ApiException {
 
-        // Stop crawling if the maximum depth is reached or the timeout has occurred.
         if (maxDepth == 0 || clock.instant().isAfter(deadline)) {
+            log.trace("Stopping crawl at URL: {} due to depth or timeout", url);
             return;
         }
 
-        // Skip URLs that match any of the excluded patterns.
         for (Pattern pattern : excludedUrls) {
             if (pattern.matcher(url).matches()) {
+                log.debug("Skipping URL: {} due to exclusion pattern", url);
                 return;
             }
         }
 
-        // Skip URLs that have already been visited.
         if (visitedUrls.contains(url)) {
+            log.debug("Skipping already visited URL: {}", url);
             return;
         }
 
-        ParseResult result = null;
         try {
+            ParseResult result = parserFactory.createParserInstance(url).parse();
+            visitedUrls.add(url);
 
-            // Attempt to parse the page and retrieve the word count results.
-            result = parserFactory.createParserInstance(url).parse();
+            for (Map.Entry<String, Integer> entry : ((WordCountParseResult) result).getWordFrequencyMap().entrySet()) {
+                counts.merge(entry.getKey(), entry.getValue(), Integer::sum);
+            }
+
+            for (String link : result.getHyperLinkList()) {
+                crawlInternal(link, deadline, maxDepth - 1, counts, visitedUrls);
+            }
         } catch (ApiException e) {
-
-            // Handle exceptions related to URL parsing, such as malformed or non-existing URLs, or request timeouts.
-            // The exception is caught, and the method returns without processing this URL further.
-            return;
-        }
-
-        // Add the current URL to the set of visited URLs.
-        visitedUrls.add(url);
-
-        // Accumulate the word counts from the parsed result.
-        for (Map.Entry<String, Integer> e : ((WordCountParseResult)result).getWordFrequencyMap().entrySet()) {
-            counts.merge(e.getKey(), e.getValue(), Integer::sum);
-        }
-
-        // Recursively crawl the links found on the current page, decreasing the depth.
-        for (String link : result.getHyperLinkList()) {
-            crawlInternal(link, deadline, maxDepth - 1, counts, visitedUrls);
+            log.error("Error parsing URL: {}", url, e);
         }
     }
 

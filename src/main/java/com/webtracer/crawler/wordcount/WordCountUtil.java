@@ -2,6 +2,7 @@ package com.webtracer.crawler.wordcount;
 
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,9 +26,9 @@ import java.util.stream.Collectors;
  *   <li>Word length in descending order (longer words first).</li>
  *   <li>Alphabetical order to break ties.</li>
  * </ol>
-
  */
 @UtilityClass
+@Slf4j
 final class WordCountUtil {
 
     /**
@@ -40,9 +41,14 @@ final class WordCountUtil {
      * @return a map containing the top {@code popularWordCount} words, sorted in the desired order.
      */
     static Map<String, Integer> sort(@NonNull Map<String, Integer> wordCounts, int popularWordCount) {
-        if(wordCounts.isEmpty()) return Collections.emptyMap();
+        log.debug("Starting sort of word counts with popularWordCount = {}", popularWordCount);
 
-        return wordCounts.entrySet().stream()
+        if (wordCounts.isEmpty()) {
+            log.info("No word counts to sort; returning empty map");
+            return Collections.emptyMap();
+        }
+
+        Map<String, Integer> sortedWordCounts = wordCounts.entrySet().stream()
                 .sorted(
                         Comparator.comparing(Map.Entry<String, Integer>::getValue)
                                 .reversed()
@@ -56,6 +62,8 @@ final class WordCountUtil {
                         Integer::sum,
                         LinkedHashMap::new
                 ));
-    }
 
+        log.debug("Completed sorting of word counts. Top {} words: {}", popularWordCount, sortedWordCounts);
+        return sortedWordCounts;
+    }
 }

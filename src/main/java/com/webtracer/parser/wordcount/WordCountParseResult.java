@@ -2,6 +2,7 @@ package com.webtracer.parser.wordcount;
 
 import com.webtracer.parser.ParseResult;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 
@@ -11,6 +12,7 @@ import java.util.*;
  * It is an immutable class and is intended to be built using its nested {@link Builder} class.
  */
 @Getter
+@Slf4j
 public final class WordCountParseResult extends ParseResult {
 
     /**
@@ -29,12 +31,15 @@ public final class WordCountParseResult extends ParseResult {
     private WordCountParseResult(Map<String, Integer> wordFrequencyMap, List<String> hyperlinkList) {
         super(hyperlinkList);
         this.wordFrequencyMap = wordFrequencyMap;
+        log.debug("WordCountParseResult created with {} words and {} hyperlinks",
+                  wordFrequencyMap.size(), hyperlinkList.size());
     }
 
     /**
      * The Builder class for constructing {@link WordCountParseResult} instances.
      * This builder tracks word counts and hyperlinks found during the parsing of an HTML page.
      */
+    @Slf4j
     static final class Builder {
         private final Map<String, Integer> wordFrequencyMap = new HashMap<>();
         private final Set<String> hyperlinkList = new HashSet<>();
@@ -49,6 +54,7 @@ public final class WordCountParseResult extends ParseResult {
          */
         void addWord(@NonNull String word) {
             wordFrequencyMap.compute(word, (k, v) -> (v == null) ? 1 : v + 1);
+            log.trace("Added/incremented word: {} (current count: {})", word, wordFrequencyMap.get(word));
         }
 
         /**
@@ -59,7 +65,11 @@ public final class WordCountParseResult extends ParseResult {
          * @throws NullPointerException if the link is null
          */
         void addLink(@NonNull String link) {
-            hyperlinkList.add(link);
+            if (hyperlinkList.add(link)) {
+                log.trace("Added hyperlink: {}", link);
+            } else {
+                log.trace("Hyperlink already exists, not adding: {}", link);
+            }
         }
 
         /**
@@ -71,6 +81,8 @@ public final class WordCountParseResult extends ParseResult {
          *         builder
          */
         WordCountParseResult build() {
+            log.debug("Building WordCountParseResult with {} words and {} hyperlinks",
+                      wordFrequencyMap.size(), hyperlinkList.size());
             return new WordCountParseResult(
                     Collections.unmodifiableMap(wordFrequencyMap),
                     hyperlinkList.stream().toList()

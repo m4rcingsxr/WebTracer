@@ -67,7 +67,7 @@ public final class WebCrawlerConfig {
      */
     @JsonProperty("customImplementation")
     @Builder.Default
-    private final String customImplementation = "";
+    private final String customImplementation = "com.webtracer.crawler.wordcount.SequentialWebCrawler";
 
     /**
      * The maximum depth of links the crawler is allowed to follow.

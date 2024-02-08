@@ -1,8 +1,8 @@
 package com.webtracer.config;
 
+import com.webtracer.ApiException;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class ConfigFileLoaderTest {
 
     @Test
-    void givenValidConfigFile_whenFetchConfig_thenConfigIsLoadedCorrectly() throws IOException {
+    void givenValidConfigFile_whenFetchConfig_thenConfigIsLoadedCorrectly() throws ApiException {
         Path configFilePath = Path.of("src/test/resources/example_config.json");
 
 
@@ -27,21 +27,21 @@ class ConfigFileLoaderTest {
     }
 
     @Test
-    void givenInvalidConfigFile_whenFetchConfig_thenIOExceptionIsThrown() throws IOException {
+    void givenInvalidConfigFile_whenFetchConfig_thenApiExceptionIsThrown() throws ApiException {
         Path configFilePath = Path.of("src/test/resources/invalid_config.json");
 
         ConfigFileLoader configFileLoader = new ConfigFileLoader(configFilePath);
 
-        assertThrows(IOException.class, configFileLoader::fetchConfig);
+        assertThrows(ApiException.class, configFileLoader::fetchConfig);
     }
 
     @Test
-    void givenNonExistentFile_whenFetchConfig_thenIOExceptionIsThrown() {
+    void givenNonExistentFile_whenFetchConfig_thenApiExceptionIsThrown() {
         Path nonExistentFilePath = Path.of("src/test/resources/invalid_config.json");
 
         ConfigFileLoader configFileLoader = new ConfigFileLoader(nonExistentFilePath);
 
-        assertThrows(IOException.class, configFileLoader::fetchConfig);
+        assertThrows(ApiException.class, configFileLoader::fetchConfig);
     }
 
 }

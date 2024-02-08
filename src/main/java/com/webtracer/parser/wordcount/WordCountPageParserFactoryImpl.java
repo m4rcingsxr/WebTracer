@@ -4,6 +4,7 @@ import com.webtracer.parser.AbstractPageParserFactory;
 import com.webtracer.parser.DefaultDocumentLoader;
 import com.webtracer.parser.DocumentLoader;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.regex.Pattern;
  * <p>This implementation leverages the Abstract Factory pattern, allowing the creation of specialized parser instances
  * without tying the client code to the specifics of the parser's construction.
  */
+@Slf4j
 public final class WordCountPageParserFactoryImpl implements AbstractPageParserFactory {
 
     private final List<Pattern> excludedPatterns;
@@ -39,6 +41,9 @@ public final class WordCountPageParserFactoryImpl implements AbstractPageParserF
             Duration crawlTimeout) {
         this.excludedPatterns = excludedWords;
         this.documentLoader = new DefaultDocumentLoader(crawlTimeout);
+
+        log.debug("WordCountPageParserFactoryImpl initialized with {} exclusion patterns and a crawl timeout of {} milliseconds",
+                  excludedWords.size(), crawlTimeout.toMillis());
     }
 
     /**
@@ -53,7 +58,10 @@ public final class WordCountPageParserFactoryImpl implements AbstractPageParserF
      */
     @Override
     public WordCountPageParserImpl createParserInstance(@NonNull final String url) {
-        return new WordCountPageParserImpl(url, excludedPatterns, documentLoader);
+        log.debug("Creating WordCountPageParserImpl for URL: {}", url);
+        WordCountPageParserImpl parser = new WordCountPageParserImpl(url, excludedPatterns, documentLoader);
+        log.info("Created WordCountPageParserImpl for URL: {}", url);
+        return parser;
     }
 
 }

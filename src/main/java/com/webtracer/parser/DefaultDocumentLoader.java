@@ -2,6 +2,7 @@ package com.webtracer.parser;
 
 import com.webtracer.ApiException;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -19,6 +20,7 @@ import java.util.Optional;
  * It applies a timeout for remote documents.
  */
 @Getter
+@Slf4j
 public final class DefaultDocumentLoader implements DocumentLoader {
 
     private final Duration parseTimeout;
@@ -41,29 +43,28 @@ public final class DefaultDocumentLoader implements DocumentLoader {
      */
     @Override
     public Optional<Document> loadDocument(URI uri) throws ApiException {
+        log.info("Attempting to load document from URI: {}", uri);
+
         try {
-            // Check if the URI points to a local file
             if (isLocalUri(uri)) {
-                // Convert the URI to a Path object
+                log.debug("The URI {} is identified as a local file URI", uri);
                 Path path = Path.of(uri.getPath());
 
-                // Check if the local file exists
                 if (!Files.exists(path)) {
-                    // If the file doesn't exist, throw an ApiException
+                    log.error("Local file does not exist: {}", path);
                     throw new ApiException("Invalid URL: Local file does not exist");
                 }
 
-                // Open an InputStream to the file and parse it into a JSoup Document
                 try (InputStream in = Files.newInputStream(path)) {
+                    log.debug("Successfully loaded local file: {}", path);
                     return Optional.of(Jsoup.parse(in, StandardCharsets.UTF_8.name(), ""));
                 }
 
             } else {
-                // If the URI is remote, use JSoup to parse the document with a timeout
+                log.debug("The URI {} is identified as a remote URL", uri);
                 return Optional.of(Jsoup.parse(uri.toURL(), (int) parseTimeout.toMillis()));
             }
         } catch (IOException e) {
-            // If an IOException occurs (e.g., network error, file I/O error), throw an ApiException
             throw new ApiException("Invalid URL", e);
         }
     }
@@ -75,6 +76,8 @@ public final class DefaultDocumentLoader implements DocumentLoader {
      * @return {@code true} if the URI is a local file URI, {@code false} otherwise.
      */
     private boolean isLocalUri(URI uri) {
-        return "file".equals(uri.getScheme());
+        boolean isLocal = "file".equals(uri.getScheme());
+        log.debug("URI {} isLocalUri: {}", uri, isLocal);
+        return isLocal;
     }
 }
