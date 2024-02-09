@@ -5,11 +5,9 @@ import com.google.inject.multibindings.Multibinder;
 import com.webtracer.ApiException;
 import com.webtracer.config.WebCrawlerConfig;
 import com.webtracer.crawler.GenericWebCrawler;
+import com.webtracer.crawler.wordcount.RecursiveActionWebCrawler;
 import com.webtracer.crawler.wordcount.SequentialWebCrawler;
-import com.webtracer.di.annotation.CrawlMaxDepth;
-import com.webtracer.di.annotation.CrawlTimeout;
-import com.webtracer.di.annotation.ExcludedUrls;
-import com.webtracer.di.annotation.PopularWordCount;
+import com.webtracer.di.annotation.*;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +32,7 @@ public class CrawlerModule extends AbstractModule {
         Multibinder<GenericWebCrawler> multibinder =
                 Multibinder.newSetBinder(binder(), GenericWebCrawler.class);
         multibinder.addBinding().to(SequentialWebCrawler.class);
+        multibinder.addBinding().to(RecursiveActionWebCrawler.class);
 
         bind(Clock.class).toInstance(Clock.systemUTC());
         bind(Key.get(Integer.class, CrawlMaxDepth.class)).toInstance(config.getMaxDepth());
@@ -53,25 +52,39 @@ public class CrawlerModule extends AbstractModule {
 
     @Provides
     @Singleton
-    GenericWebCrawler provideRawWebCrawler(Set<GenericWebCrawler> implementations) throws ApiException {
-
+    GenericWebCrawler provideWebCrawler(Set<GenericWebCrawler> implementations, @ConcurrencyLevel int parallelism) throws ApiException {
         String override = config.getCustomImplementation();
         log.debug("Provided custom implementation: {}", override);
 
-        if (override.isEmpty()) {
-            log.error("No custom implementation provided in configuration");
-            throw new ApiException("Custom implementation is required but not provided in configuration.");
+        if (!override.isEmpty()) {
+            GenericWebCrawler crawler = implementations
+                    .stream()
+                    .filter(impl -> impl.getClass().getName().equals(override))
+                    .findFirst()
+                    .orElseThrow(() -> new ApiException("Implementation not found: " + override));
+            System.out.println("Using custom implementation: " + crawler.getClass().getName());
+            return crawler;
         }
-
         GenericWebCrawler crawler = implementations
                 .stream()
-                .filter(impl -> impl.getClass().getName().equals(override))
+                .filter(impl -> parallelism <= impl.getMaxConcurrencyLevel())
                 .findFirst()
-                .orElseThrow(() -> new ApiException("Implementation not found: " + override));
-
+                .orElseThrow(
+                        () -> new ApiException(
+                                "No implementation able to handle parallelism = \"" +
+                                        config.getConcurrencyLevel() + "\"."));
         log.info("Using custom implementation: {}", crawler.getClass().getName());
-
         return crawler;
+    }
+
+    @Provides
+    @Singleton
+    @ConcurrencyLevel
+    int provideTargetParallelism() {
+        if (config.getConcurrencyLevel() >= 0) {
+            return config.getConcurrencyLevel();
+        }
+        return Runtime.getRuntime().availableProcessors();
     }
 
 }

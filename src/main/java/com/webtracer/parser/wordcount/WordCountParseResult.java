@@ -40,7 +40,7 @@ public final class WordCountParseResult extends ParseResult {
      * This builder tracks word counts and hyperlinks found during the parsing of an HTML page.
      */
     @Slf4j
-    static final class Builder {
+    public static final class Builder {
         private final Map<String, Integer> wordFrequencyMap = new HashMap<>();
         private final Set<String> hyperlinkList = new HashSet<>();
 
@@ -52,9 +52,10 @@ public final class WordCountParseResult extends ParseResult {
          * @param word the word to be added or whose count is to be incremented
          * @throws NullPointerException if the word is null
          */
-        void addWord(@NonNull String word) {
+        public Builder addWord(@NonNull String word) {
             wordFrequencyMap.compute(word, (k, v) -> (v == null) ? 1 : v + 1);
             log.trace("Added/incremented word: {} (current count: {})", word, wordFrequencyMap.get(word));
+            return this;
         }
 
         /**
@@ -64,12 +65,13 @@ public final class WordCountParseResult extends ParseResult {
          * @param link the hyperlink to be added
          * @throws NullPointerException if the link is null
          */
-        void addLink(@NonNull String link) {
+        public Builder addLink(@NonNull String link) {
             if (hyperlinkList.add(link)) {
                 log.trace("Added hyperlink: {}", link);
             } else {
                 log.trace("Hyperlink already exists, not adding: {}", link);
             }
+            return this;
         }
 
         /**
@@ -80,7 +82,7 @@ public final class WordCountParseResult extends ParseResult {
          * @return a new {@link WordCountParseResult} instance with the current state of the
          *         builder
          */
-        WordCountParseResult build() {
+        public WordCountParseResult build() {
             log.debug("Building WordCountParseResult with {} words and {} hyperlinks",
                       wordFrequencyMap.size(), hyperlinkList.size());
             return new WordCountParseResult(

@@ -2,8 +2,8 @@
   "initialPages": ["https://www.morele.net/kategoria/dyski-ssd-518/"],
   "excludedUrls": ["https://blog.udacity.com/.*"],
   "excludedWords": ["^.{1,3}$"],
-  "customImplementation": "com.webtracer.crawler.wordcount.SequentialWebCrawler",
   "timeoutSeconds": 5,
-  "popularWordCount": 10,
-  "maxDepth": 1000
+  "popularWordCount": 1000,
+  "maxDepth": 3,
+  "concurrencyLevel" : 2
 }

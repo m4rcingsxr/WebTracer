@@ -67,7 +67,7 @@ public final class WebCrawlerConfig {
      */
     @JsonProperty("customImplementation")
     @Builder.Default
-    private final String customImplementation = "com.webtracer.crawler.wordcount.SequentialWebCrawler";
+    private final String customImplementation = "";
 
     /**
      * The maximum depth of links the crawler is allowed to follow.
@@ -111,4 +111,14 @@ public final class WebCrawlerConfig {
     @JsonProperty("crawlResultPath")
     @Builder.Default
     private final String crawlResultPath = "";
+
+    /**
+     * Returns the desired level of parallelism for the web crawl.
+     *
+     * <p> If set to 1, the crawl will run sequentially. If less than 1, the number of available
+     * CPU cores is used.
+     */
+    @JsonProperty("concurrencyLevel")
+    @Builder.Default
+    private final int concurrencyLevel = 1;
 }

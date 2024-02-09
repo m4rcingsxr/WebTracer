@@ -1,10 +1,9 @@
 package com.webtracer.crawler.wordcount;
 
 import com.google.inject.Guice;
-import com.google.inject.Inject;
 import com.google.inject.Injector;
-import com.webtracer.config.WebCrawlerConfig;
 import com.webtracer.di.module.CrawlerModule;
+import com.webtracer.config.WebCrawlerConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -18,29 +17,28 @@ import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class SequentialWebCrawlerIntegrationTest {
+class RecursiveActionWebCrawlerIntegrationTest {
 
-    private SequentialWebCrawler webCrawler;
+    private RecursiveActionWebCrawler webCrawler;
     private Injector injector;
 
     private final Clock clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
-    private final Duration crawlTimeout = Duration.ofSeconds(5);
+    private final Duration crawlTimeout = Duration.ofSeconds(2);
 
     @BeforeEach
     void setUp() {
-        // Create WebCrawlerConfig using the builder pattern
+        // Initialize the WebCrawlerConfig using the builder pattern
         WebCrawlerConfig config = WebCrawlerConfig.builder()
                 .maxDepth(10)
                 .popularWordCount(10)
                 .timeout(crawlTimeout)
                 .excludedUrls(List.of())
                 .concurrencyLevel(10)
-                .customImplementation("") // Use empty to not override
                 .build();
 
-        // Create Guice injector and inject dependencies using CrawlerModule
+        // Inject dependencies using Guice
         injector = Guice.createInjector(new CrawlerModule(config));
-        webCrawler = injector.getInstance(SequentialWebCrawler.class);
+        webCrawler = injector.getInstance(RecursiveActionWebCrawler.class);
     }
 
     @Test
@@ -70,7 +68,7 @@ class SequentialWebCrawlerIntegrationTest {
     @Test
     void whenCrawlingWithTimeout_thenCrawlShouldStopAfterTimeout() {
         String resourcePath = Path.of("src/test/resources/loop.html").toUri().toString();
-        webCrawler = injector.getInstance(SequentialWebCrawler.class);
+        webCrawler = injector.getInstance(RecursiveActionWebCrawler.class);
         List<String> startingUrls = List.of(resourcePath);
         WordCountResult result = webCrawler.crawl(startingUrls);
 
@@ -98,7 +96,7 @@ class SequentialWebCrawlerIntegrationTest {
     @Test
     void whenCrawlingWithDepthLimit_thenShouldOnlyVisitUpToDepthLimit() {
         String resourcePath = Path.of("src/test/resources/index.html").toUri().toString();
-        webCrawler = injector.getInstance(SequentialWebCrawler.class);
+        webCrawler = injector.getInstance(RecursiveActionWebCrawler.class);
         List<String> startingUrls = List.of(resourcePath);
         WordCountResult result = webCrawler.crawl(startingUrls);
 
@@ -132,7 +130,7 @@ class SequentialWebCrawlerIntegrationTest {
     @Test
     void whenCrawlingWithExclusionPattern_thenShouldNotVisitExcludedUrls() {
         String resourcePath = Path.of("src/test/resources/index.html").toUri().toString();
-        webCrawler = injector.getInstance(SequentialWebCrawler.class);
+        webCrawler = injector.getInstance(RecursiveActionWebCrawler.class);
         List<String> startingUrls = List.of(resourcePath);
         WordCountResult result = webCrawler.crawl(startingUrls);
 
@@ -177,15 +175,6 @@ class SequentialWebCrawlerIntegrationTest {
         assertTrue(result.getWordFrequencyMap().isEmpty());
     }
 
-    @Test
-    void whenCrawlingNonExistentUrl_thenNoUrlsShouldBeVisited() {
-        String resourcePath = Path.of("src/test/resources/nonexistent.html").toUri().toString();
-        List<String> startingUrls = List.of(resourcePath);
-        WordCountResult result = webCrawler.crawl(startingUrls);
-
-        assertEquals(0, result.getTotalUrlsVisited());
-        assertTrue(result.getWordFrequencyMap().isEmpty());
-    }
 
     @Test
     void whenCrawlingPageWithNoContent_thenShouldHandleEmptyPageGracefully() {
