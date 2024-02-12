@@ -60,7 +60,7 @@ public final class WordCountPageParserFactoryImpl implements AbstractPageParserF
     public WordCountPageParserImpl createParserInstance(@NonNull final String url) {
         log.debug("Creating WordCountPageParserImpl for URL: {}", url);
         WordCountPageParserImpl parser = new WordCountPageParserImpl(url, excludedPatterns, documentLoader);
-        log.info("Created WordCountPageParserImpl for URL: {}", url);
+        log.debug("Created WordCountPageParserImpl for URL: {}", url);
         return parser;
     }
 

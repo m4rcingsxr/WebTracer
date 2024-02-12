@@ -14,6 +14,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.file.Path;
+import java.util.Date;
 import java.util.Objects;
 
 @Slf4j
@@ -29,6 +30,8 @@ public class App {
     }
 
     public static void main(String[] args) {
+        Date start = new Date();
+
         log.info("""
                  \s
                  /\\__\\       /\\  \\       /\\  \\    /\\  \\       /\\  \\       /\\  \\       /\\  \\       /\\  \\       /\\  \\   \s
@@ -51,6 +54,8 @@ public class App {
         try {
             WebCrawlerConfig config = new ConfigFileLoader(Path.of(args[0])).fetchConfig();
             new App(config).run();
+            Date end = new Date();
+            log.info("Elapsed time was {} ms.", end.getTime() - start.getTime());
         } catch (ApiException e) {
             log.error("An error occurred while fetching the configuration or running the application.", e);
         }
@@ -83,9 +88,14 @@ public class App {
             }
         } else {
             log.info("No result path provided, writing crawl results to console.");
-            try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(System.out)) {
+            try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(System.out) {
+                @Override
+                public void close() throws IOException {
+                    // Do not close System.out
+                    flush();
+                }
+            }) {
                 resultWriter.saveToWriter(outputStreamWriter);
-                log.info("Crawl results written to console successfully.");
             } catch (IOException e) {
                 log.error("Failed to write crawl results to console.", e);
                 throw new ApiException("Failed to write crawl result to console", e);

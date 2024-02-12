@@ -44,8 +44,8 @@ public final class WordCountPageParserImpl implements WordCountPageParser {
      * @return the result of parsing the HTML page, including word frequencies and hyperlinks
      */
     @Override
-    public WordCountParseResult parse() throws ApiException {
-        log.info("Starting to parse the page: {}", pageUri);
+    public WordCountParseResult parse() {
+        log.debug("Starting to parse the page: {}", pageUri);
 
         Optional<URI> uriOpt = parseURI(pageUri);
         if (uriOpt.isEmpty()) {
@@ -57,7 +57,13 @@ public final class WordCountPageParserImpl implements WordCountPageParser {
         log.debug("Parsed URI: {}", uri);
 
         Optional<Document> documentOpt;
-        documentOpt = documentLoader.loadDocument(uri);
+
+        try {
+            documentOpt = documentLoader.loadDocument(uri);
+        } catch (ApiException e) {
+            log.warn("Failed to load document: {}", uri, e);
+            return new WordCountParseResult.Builder().build();
+        }
 
         if (documentOpt.isEmpty()) {
             log.warn("Failed to load document from URI: {}", uri);
@@ -73,7 +79,7 @@ public final class WordCountPageParserImpl implements WordCountPageParser {
         // Traverse the document and process each node, builder accessed by single thread
         document.traverse(nodeProcessor::processNode);
 
-        log.info("Finished parsing the page: {}", pageUri);
+        log.debug("Finished parsing the page: {}", pageUri);
         return nodeProcessor.getResult();
     }
 

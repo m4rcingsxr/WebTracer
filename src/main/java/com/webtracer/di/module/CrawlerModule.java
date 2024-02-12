@@ -4,6 +4,7 @@ import com.google.inject.*;
 import com.google.inject.multibindings.Multibinder;
 import com.webtracer.ApiException;
 import com.webtracer.config.WebCrawlerConfig;
+import com.webtracer.crawler.DomainThrottler;
 import com.webtracer.crawler.GenericWebCrawler;
 import com.webtracer.crawler.wordcount.RecursiveActionWebCrawler;
 import com.webtracer.crawler.wordcount.SequentialWebCrawler;
@@ -75,6 +76,14 @@ public class CrawlerModule extends AbstractModule {
                                         config.getConcurrencyLevel() + "\"."));
         log.info("Using custom implementation: {}", crawler.getClass().getName());
         return crawler;
+    }
+
+    @Provides
+    @Singleton
+    DomainThrottler provideDomainThrottler() {
+        // You can adjust the delay between requests as needed
+        long delayBetweenRequests = config.getThrottleDelayMillis(); // Assuming this value is in the config
+        return new DomainThrottler(delayBetweenRequests);
     }
 
     @Provides

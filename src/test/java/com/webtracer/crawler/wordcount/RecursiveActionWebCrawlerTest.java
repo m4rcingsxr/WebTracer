@@ -1,6 +1,7 @@
 package com.webtracer.crawler.wordcount;
 
 import com.webtracer.ApiException;
+import com.webtracer.crawler.DomainThrottler;
 import com.webtracer.parser.AbstractPageParserFactory;
 import com.webtracer.parser.wordcount.WordCountPageParserImpl;
 import com.webtracer.parser.wordcount.WordCountParseResult;
@@ -28,6 +29,7 @@ class RecursiveActionWebCrawlerTest {
     private int maximumDepth;
     private List<Pattern> excludedUrls;
     private List<String> initialPages;
+    private DomainThrottler domainThrottler;
 
     @BeforeEach
     void setUp() {
@@ -39,6 +41,7 @@ class RecursiveActionWebCrawlerTest {
         maximumDepth = 3;
         excludedUrls = List.of(Pattern.compile(".*exclude.*"));
         initialPages = List.of("http://example.com");
+        domainThrottler = mock(DomainThrottler.class);
 
         crawler = new RecursiveActionWebCrawler(
                 clock,
@@ -47,14 +50,16 @@ class RecursiveActionWebCrawlerTest {
                 topWordCount,
                 concurrencyLevel,
                 maximumDepth,
-                excludedUrls
+                excludedUrls,
+                domainThrottler
         );
     }
 
     @Test
-    void givenValidConfiguration_whenCrawling_thenShouldReturnCorrectWordCountResult() throws ApiException {
+    void givenValidConfiguration_whenCrawling_thenShouldReturnCorrectWordCountResult() throws ApiException, InterruptedException {
         Instant fixedInstant = Instant.now();
         when(clock.instant()).thenReturn(fixedInstant);
+
         WordCountParseResult mockParseResult = new WordCountParseResult.Builder()
                 .addWord("test")
                 .addLink("http://example.com/page1")
@@ -71,10 +76,11 @@ class RecursiveActionWebCrawlerTest {
         assertEquals(2, result.getWordFrequencyMap().get("test"));
 
         verify(parserFactory).createParserInstance("http://example.com");
+        verify(domainThrottler, times(2)).acquire(anyString());
     }
 
     @Test
-    void givenCrawlTimeout_whenCrawling_thenShouldRespectTimeout() throws ApiException {
+    void givenCrawlTimeout_whenCrawling_thenShouldRespectTimeout() throws ApiException, InterruptedException {
         Instant startInstant = Instant.now();
         Instant timeoutInstant = startInstant.plus(crawlTimeout).plusSeconds(1);
         when(clock.instant()).thenReturn(startInstant, timeoutInstant);
@@ -85,10 +91,11 @@ class RecursiveActionWebCrawlerTest {
         assertEquals(0, result.getTotalUrlsVisited());
 
         verify(parserFactory, never()).createParserInstance(anyString());
+        verify(domainThrottler, never()).acquire(anyString());
     }
 
     @Test
-    void givenMaximumDepth_whenCrawling_thenShouldNotExceedDepth() throws ApiException {
+    void givenMaximumDepth_whenCrawling_thenShouldNotExceedDepth() throws ApiException, InterruptedException {
         Instant fixedInstant = Instant.now();
         when(clock.instant()).thenReturn(fixedInstant);
 
@@ -96,6 +103,7 @@ class RecursiveActionWebCrawlerTest {
                 .addWord("test")
                 .addLink("http://example.com/page1")
                 .build();
+
         when(parserFactory.createParserInstance(anyString())).thenReturn(mock(WordCountPageParserImpl.class));
         when(((WordCountPageParserImpl) parserFactory.createParserInstance(anyString())).parse()).thenReturn(mockParseResult);
 
@@ -106,7 +114,8 @@ class RecursiveActionWebCrawlerTest {
                 topWordCount,
                 concurrencyLevel,
                 1,  // max depth set to 1
-                excludedUrls
+                excludedUrls,
+                domainThrottler
         );
         WordCountResult result = crawler.crawl(initialPages);
 
@@ -116,10 +125,11 @@ class RecursiveActionWebCrawlerTest {
         assertEquals(1, result.getWordFrequencyMap().get("test"));
 
         verify(parserFactory, times(1)).createParserInstance("http://example.com");
+        verify(domainThrottler, times(1)).acquire(anyString());
     }
 
     @Test
-    void givenExcludedUrls_whenCrawling_thenShouldNotVisitExcludedUrls() throws ApiException {
+    void givenExcludedUrls_whenCrawling_thenShouldNotVisitExcludedUrls() throws ApiException, InterruptedException {
         Instant fixedInstant = Instant.now();
         when(clock.instant()).thenReturn(fixedInstant);
 
@@ -127,6 +137,7 @@ class RecursiveActionWebCrawlerTest {
                 .addWord("test")
                 .addLink("http://example.com/exclude-this")
                 .build();
+
         when(parserFactory.createParserInstance(anyString())).thenReturn(mock(WordCountPageParserImpl.class));
         when(((WordCountPageParserImpl) parserFactory.createParserInstance(anyString())).parse()).thenReturn(mockParseResult);
 
@@ -138,21 +149,24 @@ class RecursiveActionWebCrawlerTest {
         assertFalse(result.getWordFrequencyMap().containsKey("exclude-this"));
 
         verify(parserFactory, never()).createParserInstance("http://example.com/exclude-this");
+        verify(domainThrottler, times(1)).acquire(anyString());
     }
 
     @Test
-    void givenValidConfiguration_whenCrawling_thenShouldNotThrowExceptions() {
+    void givenValidConfiguration_whenCrawling_thenShouldNotThrowExceptions() throws InterruptedException {
         Instant fixedInstant = Instant.now();
         when(clock.instant()).thenReturn(fixedInstant);
 
         WordCountParseResult mockParseResult = new WordCountParseResult.Builder()
                 .addWord("test")
                 .build();
+
         when(parserFactory.createParserInstance(anyString())).thenReturn(mock(WordCountPageParserImpl.class));
         when(((WordCountPageParserImpl) parserFactory.createParserInstance(anyString())).parse()).thenReturn(mockParseResult);
 
         assertDoesNotThrow(() -> crawler.crawl(initialPages));
 
         verify(parserFactory, times(2)).createParserInstance(anyString());
+        verify(domainThrottler, times(1)).acquire(anyString());
     }
 }

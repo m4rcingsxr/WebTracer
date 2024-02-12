@@ -177,13 +177,14 @@ class SequentialWebCrawlerIntegrationTest {
         assertTrue(result.getWordFrequencyMap().isEmpty());
     }
 
+    // invalid urls that has been processed are also marked as visited
     @Test
-    void whenCrawlingNonExistentUrl_thenNoUrlsShouldBeVisited() {
+    void whenCrawlingNonExistentUrl_thenOneUrlShouldBeVisited() {
         String resourcePath = Path.of("src/test/resources/nonexistent.html").toUri().toString();
         List<String> startingUrls = List.of(resourcePath);
         WordCountResult result = webCrawler.crawl(startingUrls);
 
-        assertEquals(0, result.getTotalUrlsVisited());
+        assertEquals(1, result.getTotalUrlsVisited());
         assertTrue(result.getWordFrequencyMap().isEmpty());
     }
 

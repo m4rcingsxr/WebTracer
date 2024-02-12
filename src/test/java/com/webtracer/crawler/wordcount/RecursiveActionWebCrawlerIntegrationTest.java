@@ -2,8 +2,8 @@ package com.webtracer.crawler.wordcount;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.webtracer.di.module.CrawlerModule;
 import com.webtracer.config.WebCrawlerConfig;
+import com.webtracer.di.module.CrawlerModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +13,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,13 +26,13 @@ class RecursiveActionWebCrawlerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Initialize the WebCrawlerConfig using the builder pattern
         WebCrawlerConfig config = WebCrawlerConfig.builder()
                 .maxDepth(10)
                 .popularWordCount(10)
                 .timeout(crawlTimeout)
                 .excludedUrls(List.of())
                 .concurrencyLevel(10)
+                .throttleDelayMillis(0)
                 .build();
 
         // Inject dependencies using Guice
@@ -100,10 +99,8 @@ class RecursiveActionWebCrawlerIntegrationTest {
         List<String> startingUrls = List.of(resourcePath);
         WordCountResult result = webCrawler.crawl(startingUrls);
 
-        // Assert the number of URLs visited
         assertEquals(5, result.getTotalUrlsVisited());
 
-        // Assert the word frequencies
         assertTrue(result.getWordFrequencyMap().containsKey("section"));
         assertTrue(result.getWordFrequencyMap().containsKey("subsection"));
         assertTrue(result.getWordFrequencyMap().containsKey("to"));
@@ -114,7 +111,6 @@ class RecursiveActionWebCrawlerIntegrationTest {
         assertTrue(result.getWordFrequencyMap().containsKey("1b"));
         assertTrue(result.getWordFrequencyMap().containsKey("2"));
 
-        // Assert the word counts
         assertEquals(11, result.getWordFrequencyMap().get("section"));
         assertEquals(6, result.getWordFrequencyMap().get("subsection"));
         assertEquals(6, result.getWordFrequencyMap().get("to"));
@@ -125,7 +121,6 @@ class RecursiveActionWebCrawlerIntegrationTest {
         assertEquals(4, result.getWordFrequencyMap().get("1b"));
         assertEquals(4, result.getWordFrequencyMap().get("2"));
     }
-
 
     @Test
     void whenCrawlingWithExclusionPattern_thenShouldNotVisitExcludedUrls() {
@@ -174,7 +169,6 @@ class RecursiveActionWebCrawlerIntegrationTest {
         assertEquals(0, result.getTotalUrlsVisited());
         assertTrue(result.getWordFrequencyMap().isEmpty());
     }
-
 
     @Test
     void whenCrawlingPageWithNoContent_thenShouldHandleEmptyPageGracefully() {

@@ -121,4 +121,22 @@ public final class WebCrawlerConfig {
     @JsonProperty("concurrencyLevel")
     @Builder.Default
     private final int concurrencyLevel = 1;
+
+    /**
+     * The delay (in milliseconds) between HTTP requests per domain.
+     * <p>
+     * This setting helps to throttle requests to individual domains, reducing
+     * the likelihood of receiving HTTP 429 (Too Many Requests) responses.
+     * The delay can be adjusted experimentally to find the optimal value
+     * that minimizes the number of 429 responses while maintaining efficient
+     * crawling performance.
+     * </p>
+     * <p>
+     * Default value: 2000 milliseconds (2 seconds).
+     * </p>
+     */
+    @JsonProperty("throttleDelayMillis")
+    @Builder.Default
+    private final long throttleDelayMillis = 2000;
+
 }

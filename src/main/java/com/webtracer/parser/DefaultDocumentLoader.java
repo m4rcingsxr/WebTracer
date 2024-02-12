@@ -43,7 +43,7 @@ public final class DefaultDocumentLoader implements DocumentLoader {
      */
     @Override
     public Optional<Document> loadDocument(URI uri) throws ApiException {
-        log.info("Attempting to load document from URI: {}", uri);
+        log.debug("Attempting to load document from URI: {}", uri);
 
         try {
             if (isLocalUri(uri)) {
