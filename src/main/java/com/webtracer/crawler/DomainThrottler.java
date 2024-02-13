@@ -2,8 +2,8 @@ package com.webtracer.crawler;
 
 import com.google.inject.Inject;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -18,12 +18,12 @@ import java.util.concurrent.TimeUnit;
  */
 public final class DomainThrottler {
 
-    private final Map<String, Semaphore> domainSemaphores;
+    private final ConcurrentMap<String, Semaphore> domainSemaphores;
     private final long delayBetweenRequests;
 
     @Inject
     public DomainThrottler(long delayBetweenRequests) {
-        this.domainSemaphores = new HashMap<>();
+        this.domainSemaphores = new ConcurrentHashMap<>();
         this.delayBetweenRequests = delayBetweenRequests;
     }
 
@@ -36,6 +36,7 @@ public final class DomainThrottler {
      * @throws InterruptedException If the thread is interrupted while waiting.
      */
     public void acquire(String domain) throws InterruptedException {
+        if(delayBetweenRequests == 0) return;
 
         // Get or create a semaphore for the specified domain
         Semaphore semaphore = domainSemaphores.computeIfAbsent(domain, d -> new Semaphore(1));

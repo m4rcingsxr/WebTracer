@@ -7,6 +7,7 @@ import com.webtracer.config.WebCrawlerConfig;
 import com.webtracer.crawler.DomainThrottler;
 import com.webtracer.crawler.GenericWebCrawler;
 import com.webtracer.crawler.wordcount.RecursiveActionWebCrawler;
+import com.webtracer.crawler.wordcount.RecursiveTaskWebCrawler;
 import com.webtracer.crawler.wordcount.SequentialWebCrawler;
 import com.webtracer.di.annotation.*;
 import lombok.NonNull;
@@ -34,6 +35,7 @@ public class CrawlerModule extends AbstractModule {
                 Multibinder.newSetBinder(binder(), GenericWebCrawler.class);
         multibinder.addBinding().to(SequentialWebCrawler.class);
         multibinder.addBinding().to(RecursiveActionWebCrawler.class);
+        multibinder.addBinding().to(RecursiveTaskWebCrawler.class);
 
         bind(Clock.class).toInstance(Clock.systemUTC());
         bind(Key.get(Integer.class, CrawlMaxDepth.class)).toInstance(config.getMaxDepth());

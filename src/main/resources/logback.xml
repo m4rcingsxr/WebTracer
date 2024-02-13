@@ -6,7 +6,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.webtracer" level="DEBUG"/>
+    <logger name="com.webtracer" level="INFO"/>
 
     <root level="INFO">
         <appender-ref ref="STDOUT"/>

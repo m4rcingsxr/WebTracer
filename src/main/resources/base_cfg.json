@@ -1,8 +1,10 @@
 {
   "initialPages": ["https://blog.udacity.com"],
   "excludedWords": ["^.{1,3}$"],
-  "timeoutSeconds": 60,
+  "customImplementation" : "com.webtracer.crawler.wordcount.RecursiveTaskWebCrawler",
+  "timeoutSeconds": 100,
   "popularWordCount": 5,
   "maxDepth": 2,
-  "concurrencyLevel" : -1
+  "concurrencyLevel" : -1,
+  "throttleDelayMillis" : 500
 }
