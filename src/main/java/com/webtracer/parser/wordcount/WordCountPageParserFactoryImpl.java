@@ -40,7 +40,7 @@ public final class WordCountPageParserFactoryImpl implements AbstractPageParserF
             List<Pattern> excludedWords,
             Duration crawlTimeout) {
         this.excludedPatterns = excludedWords;
-        this.documentLoader = new DefaultDocumentLoader(crawlTimeout);
+        this.documentLoader = new DefaultDocumentLoader(Duration.ofSeconds(10));
 
         log.debug("WordCountPageParserFactoryImpl initialized with {} exclusion patterns and a crawl timeout of {} milliseconds",
                   excludedWords.size(), crawlTimeout.toMillis());

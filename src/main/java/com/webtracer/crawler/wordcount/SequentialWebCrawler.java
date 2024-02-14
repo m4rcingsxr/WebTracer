@@ -144,7 +144,7 @@ public final class SequentialWebCrawler implements WordCountWebCrawler {
                 counts.merge(entry.getKey(), entry.getValue(), Integer::sum);
             }
 
-            for (String link : result.getHyperLinkList()) {
+            for (String link : ((WordCountParseResult) result).getHyperLinkList()) {
                 crawlInternal(link, deadline, maxDepth - 1, counts, visitedUrls);
             }
         } catch (ApiException e) {

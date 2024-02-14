@@ -26,6 +26,8 @@ public class ParserModule extends AbstractModule {
                 .annotatedWith(WordCountFactory.class)
                 .toInstance(new WordCountPageParserFactoryImpl(excludedWords, crawlTimeout));
 
+
+
         log.info("ParserModule configured with WordCountPageParserFactoryImpl");
     }
 }

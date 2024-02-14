@@ -13,7 +13,8 @@ import java.util.*;
  */
 @Getter
 @Slf4j
-public final class WordCountParseResult extends ParseResult {
+@RequiredArgsConstructor
+public final class WordCountParseResult implements ParseResult {
 
     /**
      * A map that holds the frequency of words found on the parsed web page.
@@ -22,18 +23,8 @@ public final class WordCountParseResult extends ParseResult {
     @NonNull
     private final Map<String, Integer> wordFrequencyMap;
 
-    /**
-     * Private constructor to enforce the use of the {@link Builder} class for creating instances.
-     *
-     * @param wordFrequencyMap a map of word frequencies extracted from the web page
-     * @param hyperlinkList    a list of hyperlinks extracted from the web page
-     */
-    private WordCountParseResult(Map<String, Integer> wordFrequencyMap, List<String> hyperlinkList) {
-        super(hyperlinkList);
-        this.wordFrequencyMap = wordFrequencyMap;
-        log.debug("WordCountParseResult created with {} words and {} hyperlinks",
-                  wordFrequencyMap.size(), hyperlinkList.size());
-    }
+    @NonNull
+    private final List<String> hyperLinkList;
 
     /**
      * The Builder class for constructing {@link WordCountParseResult} instances.

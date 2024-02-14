@@ -48,7 +48,7 @@ final class WordCountUtil {
             return Collections.emptyMap();
         }
 
-        Map<String, Integer> sortedWordCounts = wordCounts.entrySet().stream()
+        Map<String, Integer> sortedWordCounts = wordCounts.entrySet().parallelStream()
                 .sorted(
                         Comparator.comparing(Map.Entry<String, Integer>::getValue)
                                 .reversed()

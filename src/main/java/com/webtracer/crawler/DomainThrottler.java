@@ -1,6 +1,7 @@
 package com.webtracer.crawler;
 
 import com.google.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -16,6 +17,7 @@ import java.util.concurrent.TimeUnit;
  * is processed at a time, with a delay between each request.
  * </p>
  */
+@Slf4j
 public final class DomainThrottler {
 
     private final ConcurrentMap<String, Semaphore> domainSemaphores;
@@ -36,19 +38,23 @@ public final class DomainThrottler {
      * @throws InterruptedException If the thread is interrupted while waiting.
      */
     public void acquire(String domain) throws InterruptedException {
-        if(delayBetweenRequests == 0) return;
+        if (delayBetweenRequests == 0) return;
 
-        // Get or create a semaphore for the specified domain
         Semaphore semaphore = domainSemaphores.computeIfAbsent(domain, d -> new Semaphore(1));
 
-        // Acquire the semaphore to block other requests to the same domain
-        semaphore.acquire();
+        try {
+            // Acquire the semaphore to block other requests to the same domain
+            semaphore.acquire();
 
-        // Introduce a delay between requests to the same domain
-        TimeUnit.MILLISECONDS.sleep(delayBetweenRequests);
-
-        // Release the semaphore to allow the next request to proceed
-        semaphore.release();
+            // Simulate the processing delay
+            TimeUnit.MILLISECONDS.sleep(delayBetweenRequests);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt(); // Restore interrupt status
+            log.warn("Thread interrupted while acquiring throttle for domain: {}", domain, e);
+            throw e;
+        } finally {
+            semaphore.release();
+        }
     }
 
 }

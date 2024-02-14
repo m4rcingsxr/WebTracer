@@ -1,5 +1,6 @@
 package com.webtracer.parser.wordcount;
 
+import com.webtracer.parser.NodeProcessor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +38,7 @@ import java.util.regex.Pattern;
  */
 @RequiredArgsConstructor
 @Slf4j
-final class WordCountNodeProcessor {
+final class WordCountNodeProcessor implements NodeProcessor {
 
     /**
      * Pattern to match whitespace characters. This pattern is used to split text into words.
@@ -74,7 +75,8 @@ final class WordCountNodeProcessor {
      * @param node The node being processed.
      * @param depth The depth of the node in the document tree (unused in this implementation).
      */
-    void processNode(Node node, int depth) {
+    @Override
+    public void processNode(Node node, int depth) {
         log.trace("Processing node at depth {}: {}", depth, node.nodeName());
         if (node instanceof TextNode textNode) {
             processTextNode(textNode);
@@ -89,7 +91,8 @@ final class WordCountNodeProcessor {
      *
      * @param textNode The text node to process.
      */
-    void processTextNode(TextNode textNode) {
+    @Override
+    public void processTextNode(TextNode textNode) {
         String text = textNode.text().strip();
         log.trace("Processing text node: {}", text);
 
@@ -110,7 +113,8 @@ final class WordCountNodeProcessor {
      *
      * @param element The element to process.
      */
-    void processElement(Element element) {
+    @Override
+    public void processElement(Element element) {
         log.trace("Processing element: {}", element.tagName());
         if (element.is(new Evaluator.Tag("a")) && element.hasAttr("href")) {
             String link = resolveLink(element);
@@ -126,7 +130,8 @@ final class WordCountNodeProcessor {
      * @param element The element containing the hyperlink.
      * @return The resolved absolute URL of the hyperlink.
      */
-    String resolveLink(Element element) {
+    @Override
+    public String resolveLink(Element element) {
         String href = element.attr("href");
 
         if (href.startsWith("http://") || href.startsWith("https://")) {
@@ -154,7 +159,8 @@ final class WordCountNodeProcessor {
      * @param uri The URI to check.
      * @return true if the URI represents a local file, false otherwise.
      */
-    boolean isLocalUri(URI uri) {
+    @Override
+    public boolean isLocalUri(URI uri) {
         boolean isLocal = "file".equals(uri.getScheme());
         log.trace("URI {} is local: {}", uri, isLocal);
         return isLocal;
@@ -165,7 +171,8 @@ final class WordCountNodeProcessor {
      *
      * @return The final result as a {@link WordCountParseResult}.
      */
-    WordCountParseResult getResult() {
+    @Override
+    public WordCountParseResult getResult() {
         log.debug("Building final WordCountParseResult");
         return resultBuilder.build();
     }

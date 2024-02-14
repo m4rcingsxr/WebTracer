@@ -55,7 +55,7 @@ public class CrawlerModule extends AbstractModule {
 
     @Provides
     @Singleton
-    GenericWebCrawler provideWebCrawler(Set<GenericWebCrawler> implementations, @ConcurrencyLevel int parallelism) throws ApiException {
+    GenericWebCrawler provideWebCrawler(Set<GenericWebCrawler> implementations) throws ApiException {
         String override = config.getCustomImplementation();
         log.debug("Provided custom implementation: {}", override);
 
@@ -68,23 +68,14 @@ public class CrawlerModule extends AbstractModule {
             System.out.println("Using custom implementation: " + crawler.getClass().getName());
             return crawler;
         }
-        GenericWebCrawler crawler = implementations
-                .stream()
-                .filter(impl -> parallelism <= impl.getMaxConcurrencyLevel())
-                .findFirst()
-                .orElseThrow(
-                        () -> new ApiException(
-                                "No implementation able to handle parallelism = \"" +
-                                        config.getConcurrencyLevel() + "\"."));
-        log.info("Using custom implementation: {}", crawler.getClass().getName());
-        return crawler;
+
+        throw new IllegalStateException("Please provide crawler implementation");
     }
 
     @Provides
     @Singleton
     DomainThrottler provideDomainThrottler() {
-        // You can adjust the delay between requests as needed
-        long delayBetweenRequests = config.getThrottleDelayMillis(); // Assuming this value is in the config
+        long delayBetweenRequests = config.getThrottleDelayMillis();
         return new DomainThrottler(delayBetweenRequests);
     }
 
@@ -99,3 +90,4 @@ public class CrawlerModule extends AbstractModule {
     }
 
 }
+

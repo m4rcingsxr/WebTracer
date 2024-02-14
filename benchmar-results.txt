@@ -1,0 +1,20 @@
+# JMH version: 1.35
+# VM version: JDK 17.0.6, Java HotSpot(TM) 64-Bit Server VM, 17.0.6+9-LTS-190
+# VM invoker: /opt/jdk-17.0.6/bin/java
+# VM options: <none>
+# Blackhole mode: compiler (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 1 iterations, 1 s each
+# Measurement: 5 iterations, 1 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: com.webtracer.WebCrawlerBenchmark.benchmarkRecursiveActionWebCrawler_10Words
+
+# Run progress: 0.00% complete, ETA 00:01:48
+# Fork: 1 of 1
+# Warmup Iteration   1: 70396.508 ms/op
+Iteration   1: 69279.221 ms/op
+Iteration   2: 69141.860 ms/op
+Iteration   3: 69186.362 ms/op
+Iteration   4: 69130.395 ms/op
+Iteration   5: 

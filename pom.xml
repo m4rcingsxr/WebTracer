@@ -108,6 +108,17 @@
       <version>2.0.9</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.openjdk.jmh</groupId>
+      <artifactId>jmh-core</artifactId>
+      <version>1.35</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openjdk.jmh</groupId>
+      <artifactId>jmh-generator-annprocess</artifactId>
+      <version>1.35</version>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -124,6 +135,12 @@
               <artifactId>lombok</artifactId>
               <version>1.18.30</version>
             </path>
+            <path>
+              <groupId>org.openjdk.jmh</groupId>
+              <artifactId>jmh-generator-annprocess</artifactId>
+              <version>1.35</version>
+            </path>
+
           </annotationProcessorPaths>
         </configuration>
       </plugin>
@@ -146,7 +163,7 @@
               <archive>
                 <manifest>
                   <mainClass>
-                    com.example.webcrawler.main.WebCrawlerMain
+                    com.webtracer.App
                   </mainClass>
                 </manifest>
               </archive>
@@ -171,6 +188,27 @@
             <version>5.10.1</version>
           </dependency>
         </dependencies>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.2.4</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>org.openjdk.jmh.Main</mainClass>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

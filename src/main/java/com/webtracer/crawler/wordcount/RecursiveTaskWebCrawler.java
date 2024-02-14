@@ -15,6 +15,7 @@ import java.net.URISyntaxException;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -141,8 +142,10 @@ public class RecursiveTaskWebCrawler implements WordCountWebCrawler {
 
         @Override
         protected Map<String, Integer> compute() {
+
+
             log.debug("Processing URL: {}", currentUrl);
-            Map<String, Integer> wordCounts = new ConcurrentHashMap<>();
+            Map<String, Integer> wordCounts = new HashMap<>();
 
             // Check if the maximum depth has been reached or if the deadline has passed.
             if (remainingDepth == 0 || systemClock.instant().isAfter(crawlDeadline)) {
@@ -159,7 +162,7 @@ public class RecursiveTaskWebCrawler implements WordCountWebCrawler {
             }
 
             // Check if the URL has already been visited.
-            if (!visitedUrls.add(currentUrl)) {
+            if (!visitedUrls.add(currentUrl)) { // O(1)
                 log.debug("Skipping already visited URL: {}", currentUrl);
                 return wordCounts;
             }

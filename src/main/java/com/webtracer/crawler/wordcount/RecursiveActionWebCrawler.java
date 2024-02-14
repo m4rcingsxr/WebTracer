@@ -181,9 +181,7 @@ public class RecursiveActionWebCrawler implements WordCountWebCrawler {
                     ((WordCountPageParserImpl) parserFactory.createParserInstance(currentUrl)).parse();
 
             // Update word counts with the parsed data.
-            result.getWordFrequencyMap().forEach((key, value) ->
-                                                         wordCounts.merge(key, value, Integer::sum)
-            );
+            result.getWordFrequencyMap().forEach((key, value) -> wordCounts.merge(key, value, Integer::sum));
 
             // Create and invoke subtasks for each hyperlink found on the page.
             List<RecursiveActionImpl> subtasks = result.getHyperLinkList().stream()

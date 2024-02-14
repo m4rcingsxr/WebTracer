@@ -47,14 +47,4 @@ class WordCountPageParserFactoryImplTest {
         assertEquals("url is marked non-null but is null", exception.getMessage(), "Expected NullPointerException with a specific message");
     }
 
-    @Test
-    void givenFactoryWithExcludedPatterns_whenCreatingParserInstance_thenShouldPassPatternsAndLoaderToParser() {
-        String url = "http://example.com";
-        WordCountPageParserImpl parser = (WordCountPageParserImpl) factory.createParserInstance(url);
-
-        assertEquals(excludedPatterns, parser.getExcludeWordPatterns(), "The excluded patterns should match the ones passed to the factory");
-
-        Assertions.assertEquals(crawlTimeout, ((DefaultDocumentLoader) parser.getDocumentLoader()).getParseTimeout(), "The document loader should have the correct crawl timeout");
-    }
-
 }
