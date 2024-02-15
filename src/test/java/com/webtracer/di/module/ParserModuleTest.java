@@ -27,7 +27,7 @@ class ParserModuleTest {
 
         ParserModule parserModule = ParserModule.builder()
                 .excludedWords(excludedWords)
-                .crawlTimeout(crawlTimeout)
+                .parseTimeout(crawlTimeout)
                 .build();
 
         injector = Guice.createInjector(parserModule);

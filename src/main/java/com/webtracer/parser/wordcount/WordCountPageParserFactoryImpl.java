@@ -1,9 +1,13 @@
 package com.webtracer.parser.wordcount;
 
+import com.google.inject.Inject;
+import com.webtracer.di.annotation.ExcludedUrls;
+import com.webtracer.di.annotation.ExcludedWords;
 import com.webtracer.parser.AbstractPageParserFactory;
 import com.webtracer.parser.DefaultDocumentLoader;
 import com.webtracer.parser.DocumentLoader;
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
@@ -34,16 +38,16 @@ public final class WordCountPageParserFactoryImpl implements AbstractPageParserF
      *
      * @param excludedWords a list of {@link Pattern} objects representing the URL patterns or content patterns
      *                         that should be excluded from parsing.
-     * @param crawlTimeout     the duration to be used as a timeout for the document loading process.
      */
+    @Inject
     public WordCountPageParserFactoryImpl(
-            List<Pattern> excludedWords,
-            Duration crawlTimeout) {
+            @ExcludedWords List<Pattern> excludedWords,
+            DefaultDocumentLoader documentLoader) {
         this.excludedPatterns = excludedWords;
-        this.documentLoader = new DefaultDocumentLoader(Duration.ofSeconds(10));
+        this.documentLoader = documentLoader;
 
-        log.debug("WordCountPageParserFactoryImpl initialized with {} exclusion patterns and a crawl timeout of {} milliseconds",
-                  excludedWords.size(), crawlTimeout.toMillis());
+        log.debug("WordCountPageParserFactoryImpl initialized with {} exclusion patterns and a crawl ",
+                  excludedWords.size());
     }
 
     /**

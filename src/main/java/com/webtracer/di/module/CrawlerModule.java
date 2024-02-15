@@ -41,12 +41,13 @@ public class CrawlerModule extends AbstractModule {
         bind(Key.get(Integer.class, CrawlMaxDepth.class)).toInstance(config.getMaxDepth());
         bind(Key.get(Integer.class, PopularWordCount.class)).toInstance(config.getPopularWordCount());
         bind(Key.get(Duration.class, CrawlTimeout.class)).toInstance(config.getTimeout());
+
         bind(new Key<List<Pattern>>(ExcludedUrls.class) {}).toInstance(config.getExcludedUrls());
 
         install(
                 ParserModule.builder()
                         .excludedWords(config.getExcludedWords())
-                        .crawlTimeout(config.getTimeout())
+                        .parseTimeout(config.getParseTimeout())
                         .build()
         );
 

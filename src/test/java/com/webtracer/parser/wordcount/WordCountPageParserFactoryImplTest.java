@@ -23,7 +23,7 @@ class WordCountPageParserFactoryImplTest {
     void setUp() {
         excludedPatterns = Collections.emptyList();
         crawlTimeout = Duration.ofSeconds(30);
-        factory = new WordCountPageParserFactoryImpl(excludedPatterns, crawlTimeout);
+        factory = new WordCountPageParserFactoryImpl(excludedPatterns, new DefaultDocumentLoader(crawlTimeout));
     }
 
     @Test

@@ -139,4 +139,10 @@ public final class WebCrawlerConfig {
     @Builder.Default
     private final long throttleDelayMillis = 2000;
 
+    // max jsoup parse timeout, provide seconds
+    @JsonDeserialize(using = DurationDeserializer.class)
+    @JsonProperty("parseTimeout")
+    @Builder.Default
+    private final Duration parseTimeout = Duration.ofSeconds(10);
+
 }

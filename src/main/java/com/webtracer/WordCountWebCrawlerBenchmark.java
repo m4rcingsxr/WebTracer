@@ -21,17 +21,16 @@ public class WordCountWebCrawlerBenchmark {
 
     private RecursiveActionWebCrawler recursiveActionWebCrawler;
     private RecursiveTaskWebCrawler recursiveTaskWebCrawler;
-    private final List<String> initialPages = List.of("https://example.com");
+    private final List<String> initialPages = List.of("https://blog.udacity.com");
 
     @Setup(Level.Trial)
-    public void setup() {
-    }
+    public void setup() {}
 
     // Benchmark 1: Depth 2, 1,000,000 words, 10-minute timeout
     @Benchmark
     @Warmup(iterations = 1, time = 1)
     @Measurement(iterations = 5, time = 1)
-    @Fork(1)
+
     public WordCountResult benchmarkRecursiveActionWebCrawler_1MWords() throws ApiException {
         setupWebCrawlerConfig(2, 1_000_000, Duration.ofMinutes(10), 10);
         return recursiveActionWebCrawler.crawl(initialPages);
