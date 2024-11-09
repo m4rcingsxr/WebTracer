@@ -16,9 +16,9 @@ import java.util.Objects;
 /**
  * Utility class to serialize a {@link CrawlResult} to JSON and write it to a file or output stream.
  *
- * <p>This class handles the serialization of a {@link CrawlResult} object into a JSON format and
+ * <p>This class handles the serialization of a {@link CrawlResult} object into JSON format and
  * provides methods to write the serialized data either to a file or to an arbitrary {@link Writer}.
- * It ensures that the output is correctly formatted and can be used for further processing or storage.
+ * It ensures that the output is correctly formatted and ready for further processing or storage.
  * </p>
  *
  * @param <T> The type of {@link CrawlResult} that will be serialized. This allows the class to be used

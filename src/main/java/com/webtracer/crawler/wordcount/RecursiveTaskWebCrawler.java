@@ -140,6 +140,14 @@ public class RecursiveTaskWebCrawler implements WordCountWebCrawler {
         private final List<Pattern> excludedUrlPatterns;
         private final DomainThrottler domainThrottler;
 
+        /**
+         * Processes the current URL by parsing its content, updating word counts, and recursively
+         * invoking subtasks for each hyperlink found on the page.
+         *
+         * <p>This method is part of a Fork/Join framework implementation, allowing the crawler to
+         * efficiently handle large-scale web crawling tasks in parallel.
+         * </p>
+         */
         @Override
         protected Map<String, Integer> compute() {
 

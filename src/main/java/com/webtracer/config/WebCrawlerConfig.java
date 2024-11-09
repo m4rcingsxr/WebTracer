@@ -139,7 +139,17 @@ public final class WebCrawlerConfig {
     @Builder.Default
     private final long throttleDelayMillis = 2000;
 
-    // max jsoup parse timeout, provide seconds
+    /**
+     * The maximum duration allowed for parsing an HTML document.
+     * <p>
+     * This timeout controls how long the JSoup parser will wait to parse a document before timing out.
+     * It helps in preventing the parser from hanging indefinitely on large or slow-to-respond web pages.
+     * If the parse operation exceeds this timeout, it will be interrupted, and an error will be thrown.
+     * </p>
+     * <p>
+     * Default value: 10 seconds.
+     * </p>
+     */
     @JsonDeserialize(using = DurationDeserializer.class)
     @JsonProperty("parseTimeout")
     @Builder.Default

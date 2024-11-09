@@ -20,9 +20,8 @@ import java.util.regex.Pattern;
  * words and hyperlinks. It is designed to work in conjunction with a document parser to analyze
  * the content of HTML pages, counting word frequencies and resolving hyperlinks.
  *
- * <p> The {@code WordCountNodeProcessor} is intended to be used as a helper class in the context
- * of a larger HTML parsing and analysis process, where it contributes to the creation of a
- * {@link WordCountParseResult} that encapsulates the results of the analysis.</p>
+ * <p> This class is intended to be used as a helper component in a larger HTML parsing and analysis process,
+ * where it contributes to the creation of a {@link WordCountParseResult} that encapsulates the results of the analysis.</p>
  *
  * <p> Example usage:
  * <pre>
@@ -70,9 +69,9 @@ final class WordCountNodeProcessor implements NodeProcessor {
 
     /**
      * Processes a node in the HTML document. Depending on the type of node, it delegates to either
-     * processTextNode() for text nodes or processElement() for elements.
+     * {@link #processTextNode(TextNode)} for text nodes or {@link #processElement(Element)} for elements.
      *
-     * @param node The node being processed.
+     * @param node  The node being processed.
      * @param depth The depth of the node in the document tree (unused in this implementation).
      */
     @Override

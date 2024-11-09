@@ -16,15 +16,27 @@ import java.time.Duration;
 import java.util.Optional;
 
 /**
- * Default implementation of {@link DocumentLoader} that handles both local and remote URIs.
- * It applies a timeout for remote documents.
+ * The {@code DefaultDocumentLoader} class is the default implementation of the {@link DocumentLoader} interface,
+ * responsible for loading and parsing HTML documents from both local and remote URIs. It leverages the JSoup
+ * library to parse the content into a {@link Document} object and applies a configurable timeout for remote URIs.
+ * This class is designed to handle different types of URIs, ensuring robust and flexible document loading
+ * capabilities.
  */
 @Getter
 @Slf4j
 public final class DefaultDocumentLoader implements DocumentLoader {
 
+    /**
+     * The maximum time allowed for loading and parsing a remote document. This timeout is applied to
+     * network requests when fetching documents from remote URLs.
+     */
     private final Duration parseTimeout;
 
+    /**
+     * Constructs a new {@code DefaultDocumentLoader} with the specified timeout for parsing remote documents.
+     *
+     * @param parseTimeout the maximum duration allowed for loading and parsing a remote document.
+     */
     public DefaultDocumentLoader(Duration parseTimeout) {
         this.parseTimeout = parseTimeout;
     }
@@ -65,12 +77,15 @@ public final class DefaultDocumentLoader implements DocumentLoader {
                 return Optional.of(Jsoup.parse(uri.toURL(), (int) parseTimeout.toMillis()));
             }
         } catch (IOException e) {
+            log.error("Failed to load document from URI: {}", uri, e);
             throw new ApiException("Invalid URL", e);
         }
     }
 
     /**
-     * Checks whether the given URI is a local file URI.
+     * Determines whether the given URI is a local file URI.
+     *
+     * This method checks if the scheme of the URI is "file", which indicates that it refers to a local file.
      *
      * @param uri the {@link URI} to check.
      * @return {@code true} if the URI is a local file URI, {@code false} otherwise.

@@ -7,11 +7,12 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 
 /**
- * The ParseResult class serves as a base class for storing the results of a page parsing operation.
- * It contains a list of hyperlinks found on the parsed page.
- * Subclasses should extend this class to include additional data relevant to their specific parsing tasks.
+ * The {@code ParseResult} interface serves as a marker interface for classes that represent
+ * the result of a page parsing operation. Classes implementing this interface should encapsulate
+ * the data and outcomes derived from parsing a web page or document.
+ *
+ * <p>It is intended to be extended by more specific result classes that contain relevant data
+ * according to the type of parsing performed.</p>
  */
 public interface ParseResult {
-
 }
-

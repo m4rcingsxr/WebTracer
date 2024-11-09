@@ -29,6 +29,9 @@ import java.util.regex.Pattern;
  * This crawler is designed to extract word counts from web pages and supports configurable
  * concurrency, depth limits, and URL exclusion patterns. It also includes a domain throttling
  * mechanism to avoid overwhelming servers.
+ *
+ * <p>The Fork/Join framework allows this crawler to efficiently handle recursive tasks in parallel,
+ * with each web page being processed as a separate task that can spawn subtasks for hyperlinks.</p>
  */
 @Slf4j
 public class RecursiveActionWebCrawler implements WordCountWebCrawler {
@@ -50,7 +53,8 @@ public class RecursiveActionWebCrawler implements WordCountWebCrawler {
      * @param parserFactory    the factory to create parsers for processing web pages
      * @param crawlTimeout     the maximum duration to allow for crawling
      * @param topWordCount     the maximum number of words to include in the result
-     * @param concurrencyLevel the maximum level of concurrency allowed
+     * @param concurrencyLevel the maximum level of concurrency allowed; this controls the number of threads
+     *                         that can be used simultaneously by the ForkJoinPool.
      * @param maximumDepth     the maximum depth to crawl
      * @param excludedUrls     a list of URL patterns to exclude from crawling
      * @param domainThrottler  the throttler to control request rates per domain
@@ -88,6 +92,10 @@ public class RecursiveActionWebCrawler implements WordCountWebCrawler {
      * @return a WordCountResult containing the word frequencies and the total number of visited
      * URLs
      * @throws ApiException if an error occurs during crawling
+     *
+     * <p>This method is thread-safe due to the use of {@link ConcurrentHashMap} for word counts and
+     * {@link ConcurrentSkipListSet} for tracking visited URLs. Each URL is processed in a separate
+     * task, and results are merged safely across threads.</p>
      */
     @Override
     public WordCountResult crawl(List<String> initialPages) throws ApiException {
@@ -125,6 +133,10 @@ public class RecursiveActionWebCrawler implements WordCountWebCrawler {
     /**
      * A RecursiveAction implementation for web crawling that processes a given URL
      * and recursively invokes itself for each hyperlink found on the page.
+     *
+     * <p>This class leverages the Fork/Join framework to split the crawling process into smaller tasks,
+     * each handling a single URL and its subsequent hyperlinks. Subtasks are handled concurrently using
+     * the `invokeAll` method, which efficiently manages the parallel execution of these subtasks.</p>
      */
     @RequiredArgsConstructor
     static final class RecursiveActionImpl extends RecursiveAction {
@@ -140,6 +152,14 @@ public class RecursiveActionWebCrawler implements WordCountWebCrawler {
         private final List<Pattern> excludedUrlPatterns;
         private final DomainThrottler domainThrottler;
 
+        /**
+         * Processes the current URL by parsing its content, updating word counts, and recursively
+         * invoking subtasks for each hyperlink found on the page.
+         *
+         * <p>This method is part of a Fork/Join framework implementation, allowing the crawler to
+         * efficiently handle large-scale web crawling tasks in parallel.
+         * </p>
+         */
         @Override
         protected void compute() {
             log.debug("Processing URL: {}", currentUrl);
@@ -195,6 +215,8 @@ public class RecursiveActionWebCrawler implements WordCountWebCrawler {
             log.debug("Invoking subtasks for URL: {} with {} hyperlinks", currentUrl,
                       subtasks.size()
             );
+
+            // Invoke all subtasks concurrently.
             invokeAll(subtasks);
         }
 
