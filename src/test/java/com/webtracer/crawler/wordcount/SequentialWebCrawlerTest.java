@@ -90,6 +90,7 @@ class SequentialWebCrawlerTest {
         when(pageParser.parse()).thenReturn(parseResult);
         when(parseResult.getWordFrequencyMap()).thenReturn(Map.of("example", 1));
         when(parseResult.getHyperLinkList()).thenReturn(List.of(linkedUrl));
+        when(robotsTxtCache.isAllowed(any(URI.class))).thenReturn(true);
 
         // When
         WordCountResult result = crawler.crawl(List.of(url));
@@ -117,6 +118,7 @@ class SequentialWebCrawlerTest {
         when(pageParser.parse()).thenReturn(parseResult);
         when(parseResult.getWordFrequencyMap()).thenReturn(Map.of("example", 1));
         when(parseResult.getHyperLinkList()).thenReturn(Collections.emptyList());
+        when(robotsTxtCache.isAllowed(any(URI.class))).thenReturn(true);
 
         // When
         WordCountResult result = crawler.crawl(List.of(url));
@@ -164,6 +166,7 @@ class SequentialWebCrawlerTest {
         when(pageParser.parse()).thenReturn(parseResult);
         when(parseResult.getWordFrequencyMap()).thenReturn(Map.of("example", 1));
         when(parseResult.getHyperLinkList()).thenReturn(List.of(url));
+        when(robotsTxtCache.isAllowed(any(URI.class))).thenReturn(true);
 
         // When
         WordCountResult result = crawler.crawl(List.of(url));
@@ -211,6 +214,7 @@ class SequentialWebCrawlerTest {
         when(pageParser.parse()).thenReturn(parseResult);
         when(parseResult.getWordFrequencyMap()).thenReturn(Map.of("example", 1));
         when(parseResult.getHyperLinkList()).thenReturn(Collections.emptyList());
+        when(robotsTxtCache.isAllowed(any(URI.class))).thenReturn(true);
 
         // When
         WordCountResult result = crawler.crawl(List.of(url1, url2));
@@ -240,6 +244,7 @@ class SequentialWebCrawlerTest {
         when(pageParser.parse()).thenReturn(parseResult);
         when(parseResult.getWordFrequencyMap()).thenReturn(Map.of("example", 1));
         when(parseResult.getHyperLinkList()).thenReturn(Collections.emptyList());
+        when(robotsTxtCache.isAllowed(any(URI.class))).thenReturn(true);
 
         // When
         WordCountResult result = crawler.crawl(List.of(url1, url2));
@@ -272,6 +277,7 @@ class SequentialWebCrawlerTest {
                 "another", 1
         ));
         when(parseResult.getHyperLinkList()).thenReturn(Collections.emptyList());
+        when(robotsTxtCache.isAllowed(any(URI.class))).thenReturn(true);
 
         // When
         WordCountResult result = crawler.crawl(List.of(url));

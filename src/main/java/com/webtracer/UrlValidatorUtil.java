@@ -9,7 +9,7 @@ public class UrlValidatorUtil {
     private static final Logger log = Logger.getLogger(UrlValidatorUtil.class.getName());
 
     // Apache Commons UrlValidator instance with default options (validates http, https)
-    private static final UrlValidator URL_VALIDATOR = new UrlValidator(new String[]{"http", "https"});
+    private static final UrlValidator URL_VALIDATOR = new UrlValidator(new String[]{"http", "https", "file"});
 
     /**
      * Validates if the given URL is a valid web page URL for crawling.

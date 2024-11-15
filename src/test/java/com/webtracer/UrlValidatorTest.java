@@ -22,14 +22,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
     @ParameterizedTest(name = "Given an invalid URL \"{0}\", when checked, then it should be invalid")
     @CsvSource({
-            "ftp://example.com",               // Unsupported scheme
-            "file:///path/to/file",           // Unsupported scheme
-            "http://",                        // Missing host
-            "https://.com",                   // Invalid host
-            "http://example.com/file.pdf",    // Disallowed file extension
-            "https://example.com/file.exe",   // Disallowed file extension
-            "example.com",                    // Missing scheme
-            "https://example.invalidformat"   // Invalid domain
+            "ftp://example.com",
+            "http://",
+            "https://.com",
+            "http://example.com/file.pdf",
+            "https://example.com/file.exe",
+            "example.com",
+            "https://example.invalidformat"
     })
     void givenInvalidUrl_whenChecked_thenShouldBeInvalid(String url) {
         assertFalse(UrlValidatorUtil.isValidWebPageUrl(url));
