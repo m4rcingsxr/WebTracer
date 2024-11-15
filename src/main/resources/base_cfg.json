@@ -1,10 +1,10 @@
 {
-  "initialPages": ["https://google.com/search", "https://google.com/pqa", "https://google.com/default", "https://google.com/groups", "https://google.com/sdch"],
+  "initialPages": ["https://google.com"],
   "excludedWords": ["^.{1,3}$"],
   "customImplementation" : "com.webtracer.crawler.wordcount.RecursiveTaskWebCrawler",
   "timeoutSeconds": 100,
   "popularWordCount": 5,
-  "maxDepth": 2,
+  "maxDepth": 5,
   "concurrencyLevel" : -1,
   "throttleDelayMillis" : 500
 }

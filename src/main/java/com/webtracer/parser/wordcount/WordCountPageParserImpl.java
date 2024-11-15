@@ -1,19 +1,17 @@
 package com.webtracer.parser.wordcount;
 
 import com.webtracer.ApiException;
+import com.webtracer.UrlValidatorUtil;
 import com.webtracer.parser.DocumentLoader;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -39,7 +37,6 @@ public final class WordCountPageParserImpl implements WordCountPageParser {
     @NonNull
     private final DocumentLoader documentLoader;
 
-    private static final String ROBOTS_TXT = "/robots.txt";
 
     /**
      * Parses the HTML page specified by {@code pageUri} and returns a {@link WordCountParseResult}
@@ -92,21 +89,24 @@ public final class WordCountPageParserImpl implements WordCountPageParser {
      *
      * @param uriString the string to be converted
      * @return an {@link Optional} containing the {@link URI} if the string is a valid URI,
-     *         or an empty {@link Optional} if the string is not a valid URI
+     * or an empty {@link Optional} if the string is not a valid URI
      */
     private Optional<URI> parseURI(String uriString) {
         try {
-            URI uri = new URI(uriString);
-            log.debug("Successfully parsed URI: {}", uriString);
-            return Optional.of(uri);
+            if (UrlValidatorUtil.isValidWebPageUrl(uriString)) {
+
+                URI uri = new URI(uriString);
+                log.debug("Successfully parsed URI: {}", uriString);
+                return Optional.of(uri);
+            } else {
+                throw new URISyntaxException("Not supported by WordCountWebCrawler", uriString);
+            }
         } catch (URISyntaxException e) {
             log.error("Failed to parse URI: {}", uriString, e);
             return Optional.empty();
         }
 
     }
-
-
 
 
 }

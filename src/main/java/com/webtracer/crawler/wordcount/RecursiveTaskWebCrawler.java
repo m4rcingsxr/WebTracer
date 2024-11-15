@@ -155,7 +155,6 @@ public class RecursiveTaskWebCrawler implements WordCountWebCrawler {
         @Override
         protected Map<String, Integer> compute() {
 
-
             log.debug("Processing URL: {}", currentUrl);
             Map<String, Integer> wordCounts = new HashMap<>();
 

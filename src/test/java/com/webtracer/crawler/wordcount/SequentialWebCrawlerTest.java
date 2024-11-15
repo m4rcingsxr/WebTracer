@@ -1,5 +1,6 @@
 package com.webtracer.crawler.wordcount;
 
+import com.webtracer.RobotsTxtCache;
 import com.webtracer.parser.wordcount.WordCountPageParserFactoryImpl;
 import com.webtracer.parser.wordcount.WordCountPageParserImpl;
 import com.webtracer.parser.wordcount.WordCountParseResult;
@@ -10,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
+import java.net.URI;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -33,6 +35,8 @@ class SequentialWebCrawlerTest {
     private WordCountPageParserImpl pageParser;
     @Mock
     private WordCountParseResult parseResult;
+    @Mock
+    private RobotsTxtCache robotsTxtCache;
 
     private SequentialWebCrawler crawler;
 
@@ -45,7 +49,7 @@ class SequentialWebCrawlerTest {
         int maxDepth = 2;
         excludedUrls = new ArrayList<>();
 
-        crawler = new SequentialWebCrawler(clock, crawlTimeout, maxDepth, popularWordCount, excludedUrls, parserFactory);
+        crawler = new SequentialWebCrawler(clock, crawlTimeout, maxDepth, popularWordCount, excludedUrls, parserFactory, robotsTxtCache);
     }
 
     @Test
@@ -58,6 +62,7 @@ class SequentialWebCrawlerTest {
         when(pageParser.parse()).thenReturn(parseResult);
         when(parseResult.getWordFrequencyMap()).thenReturn(Map.of("example", 1));
         when(parseResult.getHyperLinkList()).thenReturn(Collections.emptyList());
+        when(robotsTxtCache.isAllowed(any(URI.class))).thenReturn(true);
 
         // When
         WordCountResult result = crawler.crawl(List.of(url));
