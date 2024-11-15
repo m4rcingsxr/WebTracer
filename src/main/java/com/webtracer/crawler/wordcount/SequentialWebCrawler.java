@@ -1,6 +1,7 @@
 package com.webtracer.crawler.wordcount;
 
 import com.google.inject.Inject;
+import com.webtracer.RobotsTxtCache;
 import com.webtracer.di.annotation.*;
 import com.webtracer.ApiException;
 import com.webtracer.parser.AbstractPageParserFactory;
@@ -9,6 +10,7 @@ import com.webtracer.parser.wordcount.WordCountParseResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.net.URI;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -47,6 +49,8 @@ public final class SequentialWebCrawler implements WordCountWebCrawler {
     // Factory to create page parsers specific to the word count functionality.
     private final AbstractPageParserFactory parserFactory;
 
+    private final RobotsTxtCache robotsTxtCache;
+
     @Inject
     SequentialWebCrawler(
             Clock clock,
@@ -62,6 +66,7 @@ public final class SequentialWebCrawler implements WordCountWebCrawler {
         this.maxDepth = maxDepth;
         this.excludedUrls = excludedUrls;
         this.parserFactory = parserFactory;
+        this.robotsTxtCache = new RobotsTxtCache("WebTracer");
     }
 
     /**
@@ -129,6 +134,11 @@ public final class SequentialWebCrawler implements WordCountWebCrawler {
                 log.debug("Skipping URL: {} due to exclusion pattern", url);
                 return;
             }
+        }
+
+        if (!robotsTxtCache.isAllowed(URI.create(url))) {
+            log.debug("Skipping URL: {} disallowed ", url);
+            return;
         }
 
         if (visitedUrls.contains(url)) {

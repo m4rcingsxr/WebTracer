@@ -1,7 +1,7 @@
 {
-  "initialPages": ["https://sellsphere.store"],
+  "initialPages": ["https://google.com/search", "https://google.com/pqa", "https://google.com/default", "https://google.com/groups", "https://google.com/sdch"],
   "excludedWords": ["^.{1,3}$"],
-  "customImplementation" : "com.webtracer.crawler.wordcount.RecursiveActionWebCrawler",
+  "customImplementation" : "com.webtracer.crawler.wordcount.RecursiveTaskWebCrawler",
   "timeoutSeconds": 100,
   "popularWordCount": 5,
   "maxDepth": 2,

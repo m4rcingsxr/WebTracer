@@ -1,6 +1,7 @@
 package com.webtracer.crawler.wordcount;
 
 import com.webtracer.ApiException;
+import com.webtracer.RobotsTxtCache;
 import com.webtracer.crawler.DomainThrottler;
 import com.webtracer.di.annotation.*;
 import com.webtracer.parser.AbstractPageParserFactory;
@@ -42,6 +43,7 @@ public class RecursiveTaskWebCrawler implements WordCountWebCrawler {
     private final List<Pattern> excludedUrls;
     private final int maximumDepth;
     private final DomainThrottler domainThrottler;
+    private final RobotsTxtCache robotsTxtCache;
 
     /**
      * Constructs a RecursiveTaskWebCrawler with the specified parameters, including domain
@@ -75,6 +77,7 @@ public class RecursiveTaskWebCrawler implements WordCountWebCrawler {
         this.maximumDepth = maximumDepth;
         this.excludedUrls = excludedUrls;
         this.domainThrottler = domainThrottler;
+        this.robotsTxtCache = new RobotsTxtCache("WebTracer");
         log.info(
                 "Initialized RecursiveTaskWebCrawler with max depth: {}, concurrency level: {}," +
                         " crawl timeout: {}, and domain throttling.",
@@ -102,7 +105,7 @@ public class RecursiveTaskWebCrawler implements WordCountWebCrawler {
             log.debug("Invoking crawl task for URL: {}", url);
             Map<String, Integer> result = threadPool.invoke(
                     new RecursiveTaskImpl(systemClock, crawlTimeout, deadline, url, visitedUrls,
-                                          parserFactory, maximumDepth, excludedUrls, domainThrottler
+                                          parserFactory, maximumDepth, excludedUrls, domainThrottler, robotsTxtCache
                     ));
             result.forEach((key, value) -> wordCounts.merge(key, value, Integer::sum));
         }
@@ -139,6 +142,7 @@ public class RecursiveTaskWebCrawler implements WordCountWebCrawler {
         private final int remainingDepth;
         private final List<Pattern> excludedUrlPatterns;
         private final DomainThrottler domainThrottler;
+        private final RobotsTxtCache robotsTxtCache;
 
         /**
          * Processes the current URL by parsing its content, updating word counts, and recursively
@@ -161,6 +165,10 @@ public class RecursiveTaskWebCrawler implements WordCountWebCrawler {
                 return wordCounts;
             }
 
+            if (!robotsTxtCache.isAllowed(URI.create(currentUrl))) {
+                return wordCounts;
+            }
+
             // Check if the URL matches any of the ignored URL patterns.
             for (Pattern pattern : excludedUrlPatterns) {
                 if (pattern.matcher(currentUrl).matches()) {
@@ -174,6 +182,7 @@ public class RecursiveTaskWebCrawler implements WordCountWebCrawler {
                 log.debug("Skipping already visited URL: {}", currentUrl);
                 return wordCounts;
             }
+
 
             // Throttle the request based on the domain
             try {
@@ -201,7 +210,7 @@ public class RecursiveTaskWebCrawler implements WordCountWebCrawler {
                     .map(link -> new RecursiveTaskImpl(systemClock, crawlTimeout, crawlDeadline,
                                                        link, visitedUrls, parserFactory,
                                                        remainingDepth - 1, excludedUrlPatterns,
-                                                       domainThrottler
+                                                       domainThrottler, robotsTxtCache
                     ))
                     .toList();
 

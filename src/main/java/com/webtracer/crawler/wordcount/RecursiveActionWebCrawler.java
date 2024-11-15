@@ -1,6 +1,7 @@
 package com.webtracer.crawler.wordcount;
 
 import com.webtracer.ApiException;
+import com.webtracer.RobotsTxtCache;
 import com.webtracer.crawler.DomainThrottler;
 import com.webtracer.di.annotation.*;
 import com.webtracer.parser.AbstractPageParserFactory;
@@ -44,6 +45,7 @@ public class RecursiveActionWebCrawler implements WordCountWebCrawler {
     private final List<Pattern> excludedUrls;
     private final int maximumDepth;
     private final DomainThrottler domainThrottler;
+    private final RobotsTxtCache robotsTxtCache;
 
     /**
      * Constructs a RecursiveActionWebCrawler with the specified parameters, including domain
@@ -78,6 +80,7 @@ public class RecursiveActionWebCrawler implements WordCountWebCrawler {
         this.maximumDepth = maximumDepth;
         this.excludedUrls = excludedUrls;
         this.domainThrottler = domainThrottler;
+        this.robotsTxtCache = new RobotsTxtCache("WebTracer");
         log.info(
                 "Initialized RecursiveActionWebCrawler with max depth: {}, concurrency level: {}," +
                         " crawl timeout: {}, and domain throttling.",
@@ -110,7 +113,7 @@ public class RecursiveActionWebCrawler implements WordCountWebCrawler {
             threadPool.invoke(
                     new RecursiveActionImpl(systemClock, crawlTimeout, deadline, url, wordCounts,
                                             visitedUrls, parserFactory, maximumDepth, excludedUrls,
-                                            domainThrottler
+                                            domainThrottler,robotsTxtCache
                     ));
         }
 
@@ -151,6 +154,7 @@ public class RecursiveActionWebCrawler implements WordCountWebCrawler {
         private final int remainingDepth;
         private final List<Pattern> excludedUrlPatterns;
         private final DomainThrottler domainThrottler;
+        private final RobotsTxtCache robotsTxtCache;
 
         /**
          * Processes the current URL by parsing its content, updating word counts, and recursively
@@ -167,6 +171,10 @@ public class RecursiveActionWebCrawler implements WordCountWebCrawler {
             // Check if the maximum depth has been reached or if the deadline has passed.
             if (remainingDepth == 0 || systemClock.instant().isAfter(crawlDeadline)) {
                 log.debug("Stopping crawl at URL: {} due to depth limit or timeout", currentUrl);
+                return;
+            }
+
+            if (!robotsTxtCache.isAllowed(URI.create(currentUrl))) {
                 return;
             }
 
@@ -208,7 +216,7 @@ public class RecursiveActionWebCrawler implements WordCountWebCrawler {
                     .map(link -> new RecursiveActionImpl(systemClock, crawlTimeout, crawlDeadline,
                                                          link, wordCounts, visitedUrls,
                                                          parserFactory, remainingDepth - 1,
-                                                         excludedUrlPatterns, domainThrottler
+                                                         excludedUrlPatterns, domainThrottler, robotsTxtCache
                     ))
                     .toList();
 

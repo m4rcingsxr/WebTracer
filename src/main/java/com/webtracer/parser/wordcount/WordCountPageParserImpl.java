@@ -7,10 +7,13 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -35,6 +38,8 @@ public final class WordCountPageParserImpl implements WordCountPageParser {
 
     @NonNull
     private final DocumentLoader documentLoader;
+
+    private static final String ROBOTS_TXT = "/robots.txt";
 
     /**
      * Parses the HTML page specified by {@code pageUri} and returns a {@link WordCountParseResult}
@@ -98,5 +103,10 @@ public final class WordCountPageParserImpl implements WordCountPageParser {
             log.error("Failed to parse URI: {}", uriString, e);
             return Optional.empty();
         }
+
     }
+
+
+
+
 }
